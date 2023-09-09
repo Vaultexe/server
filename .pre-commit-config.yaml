@@ -1,0 +1,50 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_language_version:
+  python: python3.11
+repos:
+# Pre-commit hooks
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.4.0
+  hooks:
+  - id: check-added-large-files
+    args:
+      - --maxkb=1024
+  - id: check-merge-conflict
+  - id: trailing-whitespace
+  - id: detect-private-key
+  - id: end-of-file-fixer
+  - id: check-json
+  - id: check-toml
+  - id: check-yaml
+    args:
+    - --unsafe
+# Ruff is a super fast linter written in Rust.
+- repo: https://github.com/charliermarsh/ruff-pre-commit
+  rev: v0.0.287
+  hooks:
+  - id: ruff
+    name: Code linting
+    args:
+    - --fix
+# Black is the python code formatter.
+- repo: https://github.com/psf/black
+  rev: 23.7.0
+  hooks:
+  - id: black
+    args: [--config=./pyproject.toml]
+    files: ^app/.*\.py$
+# Bandit finds common security issues in Python code.
+- repo: https://github.com/PyCQA/bandit
+  rev: 1.7.5
+  hooks:
+  - id: bandit
+    args: [-l, -r, -x, tests]
+    files: ^app/.*\.py$
+# Codespell is a spell checker for source code.
+- repo: https://github.com/codespell-project/codespell
+  rev: v2.2.5
+  hooks:
+  - id: codespell
+    additional_dependencies:
+      - tomli
