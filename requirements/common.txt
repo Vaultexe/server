@@ -1,0 +1,23 @@
+# App
+fastapi==0.103.1
+uvicorn==0.23.2
+pydantic==2.3.0
+pydantic-settings==2.0.3
+email-validator==2.0.0.post2
+
+# Email
+sendgrid==6.10.0
+
+# Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+argon2-cffi==23.1.0
+
+# Database
+asyncpg==0.28.0
+alembic==1.12.0
+SQLAlchemy==2.0.20
+
+# Cache
+redis[hiredis]==5.0.0
+rq==1.15.1
