@@ -1,7 +1,8 @@
 from fastapi import APIRouter, status
-from fastapi.responses import HTMLResponse, Response
+from fastapi.responses import Response
 
 router = APIRouter()
+
 
 @router.get("/health")
 async def health():
