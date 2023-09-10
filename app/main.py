@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware import cors
+
 from app.api.routes import api
+from app.core.config import settings
+
 
 def add_routers(app: FastAPI) -> None:
     app.include_router(api.router)
@@ -19,7 +22,7 @@ def add_middlewares(app: FastAPI) -> None:
 def create_app() -> FastAPI:
     """App factory"""
     app = FastAPI(
-        title="Vaultexe",
+        title=settings.PROJECT_NAME,
         description="A production grade server example of a password manager",
         openapi_url="/openapi.json",
         docs_url="/docs",
@@ -28,5 +31,6 @@ def create_app() -> FastAPI:
     add_routers(app)
     add_middlewares(app)
     return app
+
 
 app = create_app()
