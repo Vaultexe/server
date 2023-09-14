@@ -31,7 +31,7 @@ jobs:
         pip3 install --upgrade pip
         pip3 install -r ./requirements/dev.txt
 
-    - name: Run Tests and Coverage
+    - name: Run Tests
       run: coverage run --rcfile=pyproject.toml -m pytest ./tests/
 
     - name: Enforce Coverage
