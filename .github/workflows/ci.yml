@@ -1,0 +1,71 @@
+name: CI
+
+on: push
+
+jobs:
+
+  tests:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - uses: actions/cache@v3
+      id: cache
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('./requirements/*') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        pip3 install --upgrade pip
+        pip3 install -r ./requirements/dev.txt
+
+    - name: Run Tests and Coverage
+      run: coverage run --rcfile=pyproject.toml -m pytest ./tests/
+
+    - name: Enforce Coverage
+      run: |
+        coverage combine
+        coverage report --rcfile=pyproject.toml -m
+
+  docstring-coverage:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - uses: actions/cache@v3
+        id: cache
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('./requirements/*') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: |
+            pip3 install --upgrade pip
+            pip3 install -r ./requirements/dev.txt
+
+      - name: Run Interrogate
+        run: |
+          interrogate
