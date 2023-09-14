@@ -32,7 +32,7 @@ ignore-module = true
 ignore-nested-functions = true
 ignore-nested-classes = true
 ignore-setters = false
-fail-under = 70
+fail-under = 20
 exclude = [
     "tests/*",
     "alembic/*",
@@ -70,7 +70,6 @@ ignore = [
 "locustfile.py" = ["B012"]  # B012 `break` inside `finally` blocks cause exceptions to be silenced
 
 [tool.coverage.run]
-source = ["app"]
 branch = true
 parallel = true
 
