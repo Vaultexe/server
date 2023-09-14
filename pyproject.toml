@@ -70,7 +70,6 @@ ignore = [
 "locustfile.py" = ["B012"]  # B012 `break` inside `finally` blocks cause exceptions to be silenced
 
 [tool.coverage.run]
-source = ["app"]
 branch = true
 parallel = true
 
