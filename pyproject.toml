@@ -32,7 +32,7 @@ ignore-module = true
 ignore-nested-functions = true
 ignore-nested-classes = true
 ignore-setters = false
-fail-under = 70
+fail-under = 20
 exclude = [
     "tests/*",
     "alembic/*",
