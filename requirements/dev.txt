@@ -3,7 +3,7 @@
 mypy==1.5.1
 black==23.9.1
 isort==5.12.0
-pyupgrade==3.11.0
+pyupgrade==3.11.1
 ruff==0.0.290
 bandit==1.7.5
 interrogate==1.5.0
