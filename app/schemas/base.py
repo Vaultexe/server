@@ -1,5 +1,5 @@
-from pydantic import BaseModel
+import pydantic
 
 
-class BaseSchema(BaseModel):
+class BaseSchema(pydantic.BaseModel):
     ...

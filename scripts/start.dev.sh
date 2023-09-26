@@ -22,4 +22,4 @@ PORT=${BACKEND_DEV_PORT?PORT undefined}
 LOG_LEVEL=${LOG_LEVEL:-info}
 
 # Start Uvicorn
-exec uvicorn "$APP_MODULE" --reload --host $HOST --port $PORT --workers 10 --proxy-headers --log-level $LOG_LEVEL
+exec uvicorn "$APP_MODULE" --reload --host $HOST --port $PORT --proxy-headers --log-level $LOG_LEVEL
