@@ -2,6 +2,8 @@ import asyncio
 from logging.config import fileConfig
 
 from alembic import context
+from alembic.operations.ops import MigrationScript
+from alembic.script import ScriptDirectory
 from sqlalchemy import engine_from_config, pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -37,6 +39,27 @@ target_metadata = base_model_metadata
 # ... etc.
 
 
+def process_revision_directives(context: context, _ , directives: list[MigrationScript]):
+    """
+    Custom revision directive to automatically generate revision id's sequentially.
+    Reference: https://stackoverflow.com/a/67398484/19517403
+    """
+    # extract Migration
+    migration_script = directives[0]
+    # extract current head revision
+    head_revision = ScriptDirectory.from_config(context.config).get_current_head()
+
+    if head_revision is None:
+        # edge case with first migration
+        new_rev_id = 1
+    else:
+        # default branch with incrementation
+        last_rev_id = int(head_revision.lstrip('0'))
+        new_rev_id = last_rev_id + 1
+    # fill zeros up to 4 digits: 1 -> 0001
+    migration_script.rev_id = f'{new_rev_id:04}'
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -55,6 +78,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        process_revision_directives=process_revision_directives,
     )
 
     with context.begin_transaction():
@@ -62,7 +86,11 @@ def run_migrations_offline() -> None:
 
 
 def do_run_migrations(connection: Connection) -> None:
-    context.configure(connection=connection, target_metadata=target_metadata)
+    context.configure(
+        connection=connection,
+        target_metadata=target_metadata,
+        process_revision_directives=process_revision_directives,
+    )
 
     with context.begin_transaction():
         context.run_migrations()
