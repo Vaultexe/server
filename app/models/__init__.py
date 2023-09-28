@@ -7,3 +7,5 @@ Import all models here is essential for alembic to detect them.
 from .base import BaseModel
 
 from .user import User
+
+from .device import Device

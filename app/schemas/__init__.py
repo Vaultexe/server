@@ -7,3 +7,5 @@ from .user import (
     UserLogin,
     User,
 )
+
+from .device import Device
