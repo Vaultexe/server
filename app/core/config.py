@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     PGBOUNCER_URI: str | None
     DATABASE_DSN: str | None = None
 
+    # Cache
+    REDIS_URI: str
+
     @field_validator("DATABASE_DSN", mode="before")
     def assemble_db_dsn(cls, v, info: ValidationInfo) -> str:
         """Assemble database DSN from environment variables"""

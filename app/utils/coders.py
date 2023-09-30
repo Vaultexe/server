@@ -34,9 +34,7 @@ class JsonEncoder(json.JSONEncoder):
 
 
 def object_hook(obj: dict) -> Any:
-    """
-    Convert certain custom encoded types to their original form.
-    """
+    """Decode back custom types"""
     type = obj.get("__type__", None)
 
     if type is None:
