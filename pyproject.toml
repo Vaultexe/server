@@ -4,7 +4,7 @@ profile = "black"
 
 [tool.black]
 line-length = 140
-target-version = ['py311']
+target-version = ['py312']
 exclude = '''
     /(
         \.git
@@ -57,7 +57,7 @@ select = [
     "UP", # automatically upgrade syntax for newer versions of the language
 ]
 
-target-version = "py311"
+target-version = "py312"
 
 ignore = [
     "E501",  # line too long, handled by black,

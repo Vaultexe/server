@@ -1,7 +1,7 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 default_language_version:
-  python: python3.11
+  python: python3.12
 repos:
 # Pre-commit hooks
 - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -21,7 +21,7 @@ repos:
     - --unsafe
 # Ruff is a super fast linter written in Rust.
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.291
+  rev: v0.0.292
   hooks:
   - id: ruff
     name: Code linting
