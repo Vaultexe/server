@@ -21,6 +21,8 @@ class User(BaseModel):
     name: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(String(length=100), nullable=False, unique=True)
     email_verified: Mapped[bool] = mapped_column(nullable=False, default=False)
+    is_active: Mapped[bool] = mapped_column(nullable=False, default=False)
+    is_admin: Mapped[bool] = mapped_column(nullable=False, default=False)
     master_pwd_hash: Mapped[str] = mapped_column(nullable=False)
     master_pwd_hint: Mapped[str | None] = mapped_column(nullable=True)
     last_pwd_change: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
