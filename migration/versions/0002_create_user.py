@@ -9,8 +9,8 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = '0001'
-down_revision = None
+revision = '0002'
+down_revision = '0001'
 branch_labels = None
 depends_on = None
 
@@ -23,6 +23,8 @@ def upgrade() -> None:
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('email', sa.String(length=100), nullable=False),
         sa.Column('email_verified', sa.Boolean(), nullable=False),
+        sa.Column('is_active', sa.Boolean(), nullable=False),
+        sa.Column('is_admin', sa.Boolean(), nullable=False),
         sa.Column('master_pwd_hash', sa.String(), nullable=False),
         sa.Column('master_pwd_hint', sa.String(), nullable=True),
         sa.Column('last_pwd_change', sa.DateTime(timezone=True), nullable=True),
