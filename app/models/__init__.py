@@ -10,4 +10,6 @@ from .user import User
 
 from .device import Device
 
+from .cipher import Cipher
+
 from .collection import Collection
