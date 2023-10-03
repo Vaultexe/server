@@ -3,10 +3,8 @@ import uuid
 
 import sqlalchemy as sa
 import sqlalchemy.dialects.postgresql as pg
-from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app import schemas
 from app.models import BaseModel
 from app.models.enums import PgCipherType
 from app.schemas.enums import CipherType
@@ -20,8 +18,3 @@ class Cipher(BaseModel):
     data: Mapped[str] = mapped_column(sa.String, nullable=False)
     created_at: Mapped[dt.datetime] = mapped_column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())
     updated_at: Mapped[dt.datetime | None] = mapped_column(sa.DateTime(timezone=True), nullable=True, server_onupdate=sa.func.now())
-
-    @hybrid_property
-    @data.setter
-    def data(self, data: schemas.CipherData) -> None:
-        self.data = data.model_dump_json()
