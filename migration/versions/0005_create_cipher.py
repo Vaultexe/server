@@ -27,12 +27,13 @@ def upgrade() -> None:
         sa.Column("data", sa.LargeBinary(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
         sa.ForeignKeyConstraint(["collection_id"], ["collection.id"], name=op.f("fk_cipher_collection_id_collection")),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"], name=op.f("fk_cipher_user_id_user")),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_cipher")),
     )
-    op.create_index(op.f("ix_cipher_collection_id"), "cipher", ["collection_id"], unique=False)
     op.create_index(op.f("ix_cipher_user_id"), "cipher", ["user_id"], unique=False)
+    op.create_index(op.f("ix_cipher_collection_id"), "cipher", ["collection_id"], unique=False)
 
 def downgrade() -> None:
     """ Drop cipher table """

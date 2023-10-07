@@ -15,6 +15,7 @@ class Cipher(BaseModel):
     user_id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), sa.ForeignKey("user.id"), index=True, nullable=False)
     collection_id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), sa.ForeignKey("collection.id"), index=True, nullable=False)
     type: Mapped[CipherType] = mapped_column(PgCipherType, nullable=False)
-    data: Mapped[str] = mapped_column(sa.String, nullable=False)
+    data: Mapped[bytes] = mapped_column(sa.LargeBinary(), nullable=False)
     created_at: Mapped[dt.datetime] = mapped_column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())
     updated_at: Mapped[dt.datetime | None] = mapped_column(sa.DateTime(timezone=True), nullable=True, server_onupdate=sa.func.now())
+    deleted_at: Mapped[dt.datetime | None] = mapped_column(sa.DateTime(timezone=True), nullable=True)
