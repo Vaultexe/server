@@ -1,6 +1,6 @@
 import pytest
 
-from app.utils.regex import camel_to_snake
+from app.utils.regex import camel_to_snake, generate_password, is_valid_password
 
 
 @pytest.mark.parametrize('input, expected', [
@@ -13,3 +13,26 @@ from app.utils.regex import camel_to_snake
 ])
 def test_camel_to_snake(input: str, expected: str):
     assert camel_to_snake(input) == expected
+
+
+@pytest.mark.parametrize('input, expected', [
+    ('', False),
+    ('12345678', False),
+    ('password', False),
+    ('Password', False),
+    ('Password123', False),
+    ('!@#$%^&*()_+-', False),
+    ('Password123!', True),
+    ('Password123[', True),
+    ('Aa1!@#$%^&*()_+-', True),
+])
+def test_is_valid_password(input: str, expected: bool):
+    assert is_valid_password(input) == expected
+
+
+@pytest.mark.parametrize('input, expected', [
+    (generate_password(), True)
+    for _ in range(100)
+])
+def test_generate_password(input: str, expected: bool):
+    assert is_valid_password(input) == expected
