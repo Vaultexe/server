@@ -20,7 +20,6 @@ def upgrade() -> None:
     op.create_table(
         'user',
         sa.Column('id', sa.UUID(), nullable=False),
-        sa.Column('name', sa.String(), nullable=False),
         sa.Column('email', sa.String(length=100), nullable=False),
         sa.Column('email_verified', sa.Boolean(), nullable=False),
         sa.Column('is_active', sa.Boolean(), nullable=False),

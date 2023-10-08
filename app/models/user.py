@@ -18,7 +18,6 @@ from app.models import BaseModel
 
 class User(BaseModel):
     id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
-    name: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(String(length=100), nullable=False, unique=True)
     email_verified: Mapped[bool] = mapped_column(nullable=False, default=False)
     is_active: Mapped[bool] = mapped_column(nullable=False, default=False)
