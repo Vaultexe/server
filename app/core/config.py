@@ -19,6 +19,14 @@ class Settings(BaseSettings):
     BACKEND_DOMAIN: str
     PROJECT_NAME: str
 
+    # SECURITY
+    OTP_EXPIRE_SECONDS: int
+    OTP_LENGTH: int
+    JWT_HASHING_ALGORITHM: str = "HS256"
+    JWT_SECRET_KEY: str
+    REFRESH_TOKEN_EXPIRE_SECONDS: int
+    ACCESS_TOKEN_EXPIRE_SECONDS: int
+
     # DB
     USE_PGBOUNCER: bool = False
     POSTGRES_URI: str | None
