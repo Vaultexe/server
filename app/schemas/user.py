@@ -4,7 +4,7 @@ from typing import Self
 
 from pydantic import EmailStr, computed_field, model_validator
 
-from app.core.security import sha256_hash
+from app.core.security import hash_pwd
 from app.schemas.base import BaseSchema
 from app.utils.regex import generate_password
 
@@ -16,7 +16,7 @@ class UserInvite(BaseSchema):
     @property
     def master_pwd_hash() -> str:
         pwd = generate_password()
-        return sha256_hash(pwd)
+        return hash_pwd(pwd)
 
 
 class UserLogin(BaseSchema):
