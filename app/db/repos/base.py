@@ -1,17 +1,14 @@
 from abc import ABC
-from typing import Generic, TypeVar
 from uuid import UUID
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import models, schemas
-
-ModelType = TypeVar("ModelType", bound=models.BaseModel)
-CreateSchemaType = TypeVar("CreateSchemaType", bound=schemas.BaseSchema)
+from app.models.base import BaseModel
+from app.schemas.base import BaseSchema
 
 
-class BaseRepo(ABC, Generic[ModelType, CreateSchemaType]):
+class BaseRepo[ModelType: BaseModel, CreateSchemaType: BaseSchema](ABC):
     """
     Base repository class with default CRUD operations
     """
