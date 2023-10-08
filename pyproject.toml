@@ -63,6 +63,7 @@ ignore = [
     "E501",  # line too long, handled by black,
     "B904",  # * Within an except clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
     "B008",  # do not perform function calls in argument defaults. Ignored to allow dependencies in FastAPI
+    "B024", # Do not fail for abstract classes with no abstract methods
 ]
 
 [tool.ruff.per-file-ignores]
