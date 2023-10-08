@@ -25,3 +25,10 @@ class BaseEnum(str, Enum):
 class CipherType(BaseEnum):
     LOGIN = auto()
     NOTE = auto()
+
+
+class TokenType(BaseEnum):
+    ACCESS = auto()
+    REFRESH = auto()
+    OTP = auto()
+    RESET_PASSWORD = auto()
