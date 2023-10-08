@@ -7,7 +7,8 @@ Create Date: 2023-10-03 22:51:12.404481
 """
 import sqlalchemy as sa
 from alembic import op
-from sqlalchemy.dialects import postgresql
+
+from app.models.enums import PgCipherType
 
 # revision identifiers, used by Alembic.
 revision = "0005"
@@ -22,8 +23,8 @@ def upgrade() -> None:
         "cipher",
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("user_id", sa.UUID(), nullable=False),
-        sa.Column("collection_id", sa.UUID(), nullable=False),
-        sa.Column("type", postgresql.ENUM("LOGIN", "NOTE", name="cipher_type"), nullable=False),
+        sa.Column("collection_id", sa.UUID(), nullable=True),
+        sa.Column("type", PgCipherType, nullable=False),
         sa.Column("data", sa.LargeBinary(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
