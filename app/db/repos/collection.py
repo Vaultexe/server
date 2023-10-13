@@ -6,4 +6,4 @@ class CollectionRepo(BaseRepo[models.Collection, schemas.CollectionCreate]):
     """Cipher repo"""
 
 
-cipher = CollectionRepo(models.Collection)
+collection = CollectionRepo(models.Collection)

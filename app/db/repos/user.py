@@ -6,4 +6,4 @@ class UserRepo(BaseRepo[models.User, schemas.UserInvite]):
     """User repo"""
 
 
-cipher = UserRepo(models.User)
+user = UserRepo(models.User)
