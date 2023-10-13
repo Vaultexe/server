@@ -5,7 +5,7 @@ default_language_version:
 repos:
 # Pre-commit hooks
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.4.0
+  rev: v4.5.0
   hooks:
   - id: check-added-large-files
     args:
@@ -43,7 +43,7 @@ repos:
     files: ^app/.*\.py$
 # Codespell is a spell checker for source code.
 - repo: https://github.com/codespell-project/codespell
-  rev: v2.2.5
+  rev: v2.2.6
   hooks:
   - id: codespell
     additional_dependencies:
