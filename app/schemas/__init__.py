@@ -35,3 +35,5 @@ from .invitation import (
 )
 
 from .email import RegistrationEmailPayload
+
+from .worker_job import WorkerJob
