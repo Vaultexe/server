@@ -1,6 +1,6 @@
 from enum import Enum
 
-from pydantic import field_validator
+from pydantic import EmailStr, field_validator
 from pydantic_core.core_schema import ValidationInfo
 from pydantic_settings import BaseSettings
 
@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     BACKEND_DOMAIN: str
     PROJECT_NAME: str
 
+    # Admin
+    SUPERUSER_EMAIL: EmailStr
+
     # SECURITY
     OTP_EXPIRE_SECONDS: int
     OTP_LENGTH: int
@@ -26,6 +29,12 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     REFRESH_TOKEN_EXPIRE_SECONDS: int
     ACCESS_TOKEN_EXPIRE_SECONDS: int
+
+    # SMTP
+    EMAILS_ENABLED: bool
+    SENDGRID_API_KEY: str
+    EMAILS_FROM: EmailStr
+    EMAILS_STATUS_TTL: int = 60 * 60 * 24  # 1 day
 
     # DB
     USE_PGBOUNCER: bool = False
