@@ -28,3 +28,5 @@ from .token import (
     OTPTokenClaim,
     OTPSaltedHash,
 )
+
+from .email import RegistrationEmailPayload
