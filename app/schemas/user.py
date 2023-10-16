@@ -11,6 +11,7 @@ from app.utils.regex import generate_password
 
 class UserInvite(BaseSchema):
     email: EmailStr
+    is_admin: bool = False
 
     @computed_field(description="Auto generated password on invitation")
     @property
