@@ -1,10 +1,12 @@
 import datetime as dt
 import uuid
+from typing import Self
 
 import sqlalchemy.dialects.postgresql as pg
 from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column
 
+from app.core import security
 from app.models import BaseModel
 
 """
@@ -27,3 +29,13 @@ class User(BaseModel):
     last_pwd_change: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_email_change: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+
+    def update_password(self, password: str) -> Self:
+        """Hashes the already 2 time KDF hash of master password client side"""
+        self.master_pwd_hash = security.hash_pwd(password)
+        return self
+
+    def activate(self) -> Self:
+        """Activate user"""
+        self.is_active = True
+        return self

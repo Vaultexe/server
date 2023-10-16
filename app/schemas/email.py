@@ -12,4 +12,4 @@ class EmailPayload(BaseSchema):
 class RegistrationEmailPayload(EmailPayload):
     subject: str = "Register into Vaultexe"
     token: str
-    expires_in: int
+    expires_in_hours: int

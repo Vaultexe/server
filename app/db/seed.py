@@ -39,7 +39,8 @@ async def _seed_super_user(db: AsyncSession) -> None:
     try:
         await repos.user.create(db, obj_in=admin_invite)
         await db.commit()
-    except Exception:
+    except Exception as e:
+        logger.error(e)
         logger.info("Super user already exists")
 
     # TODO: Send an email invitation to the new admin to register his password

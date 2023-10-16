@@ -13,3 +13,5 @@ from .device import Device
 from .cipher import Cipher
 
 from .collection import Collection
+
+from .invitation import Invitation

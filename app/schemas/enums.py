@@ -32,3 +32,9 @@ class TokenType(BaseEnum):
     REFRESH = auto()
     OTP = auto()
     RESET_PASSWORD = auto()
+
+
+class WorkerQueue(BaseEnum):
+    HIGH = "high"
+    DEFAULT = "default"
+    LOW = "low"

@@ -60,5 +60,9 @@ class Settings(BaseSettings):
     def is_prod(self) -> bool:
         return self.ENV == Env.prod
 
+    @property
+    def email_enabled(self) -> bool:
+        return self.is_prod or self.EMAILS_ENABLED
+
 
 settings = Settings()
