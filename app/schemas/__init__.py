@@ -29,4 +29,9 @@ from .token import (
     OTPSaltedHash,
 )
 
+from .invitation import (
+    InvitationCreate,
+    Invitation,
+)
+
 from .email import RegistrationEmailPayload
