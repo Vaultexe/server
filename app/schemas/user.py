@@ -15,7 +15,7 @@ class UserInvite(BaseSchema):
 
     @computed_field(description="Auto generated password on invitation")
     @property
-    def master_pwd_hash() -> str:
+    def master_pwd_hash(self) -> str:
         pwd = generate_password()
         return hash_pwd(pwd)
 
