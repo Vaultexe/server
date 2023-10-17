@@ -18,9 +18,10 @@ exclude = '''
 '''
 
 [tool.ruff]
+target-version = "py312"
+
 preview = true
 unsafe-fixes = true
-
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -29,9 +30,10 @@ select = [
     "C",  # flake8-comprehensions
     "B",  # flake8-bugbear
     "UP", # automatically upgrade syntax for newer versions of the language
+    "ASYNC", # flake8-async
 ]
 
-target-version = "py312"
+fixable = ["ALL"]
 
 ignore = [
     "E501",  # line too long, handled by black,
