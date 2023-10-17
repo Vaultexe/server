@@ -22,7 +22,7 @@ def upgrade() -> None:
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("user_id", sa.UUID(), nullable=False),
         sa.Column("user_agent", sa.String(length=350), nullable=False),
-        sa.Column("regestered_at",sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("regestered_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("last_login_ip", sa.String(length=45), nullable=False),
         sa.Column("last_login_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"], name=op.f("fk_device_user_id_user")),

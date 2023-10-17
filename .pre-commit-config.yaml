@@ -21,7 +21,7 @@ repos:
     - --unsafe
 # Ruff is a super fast linter written in Rust.
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.0.292
+  rev: v0.1.0
   hooks:
   - id: ruff
     name: Code linting
