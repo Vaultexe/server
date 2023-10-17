@@ -1,7 +1,3 @@
-[tool.isort]
-skip_glob = ["__init__.py"]
-profile = "black"
-
 [tool.black]
 line-length = 140
 target-version = ['py312']
@@ -21,32 +17,9 @@ exclude = '''
     )/
 '''
 
-[tool.interrogate]
-ignore-init-method = true
-ignore-init-module = true
-ignore-magic = false
-ignore-semiprivate = false
-ignore-private = false
-ignore-property-decorators = false
-ignore-module = true
-ignore-nested-functions = true
-ignore-nested-classes = true
-ignore-setters = false
-fail-under = 20
-exclude = [
-    "tests/*",
-    "alembic/*",
-    "app/schemas/*"
-]
-ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
-# possible values: 0 (minimal output), 1 (-v), 2 (-vv)
-verbose = 1
-quiet = false
-whitelist-regex = []
-color = true
-omit-covered-files = false
-
 [tool.ruff]
+unsafe-fixes = true
+
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -93,6 +66,33 @@ exclude_also = [
     # Don't complain about abstract methods, they aren't run:
     "@(abc\\.)?abstractmethod",
 ]
+
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-module = true
+ignore-nested-functions = true
+ignore-nested-classes = true
+ignore-setters = false
+fail-under = 20
+exclude = [
+    "tests/*",
+    "alembic/*",
+    "app/schemas/*"
+]
+ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
+# possible values: 0 (minimal output), 1 (-v), 2 (-vv)
+verbose = 1
+quiet = false
+whitelist-regex = []
+color = true
+omit-covered-files = false
+
 
 [tool.codespell]
 skip = '.git,*.env'
