@@ -39,7 +39,7 @@ target_metadata = base_model_metadata
 # ... etc.
 
 
-def process_revision_directives(context: context, _ , directives: list[MigrationScript]):
+def process_revision_directives(context: context, _, directives: list[MigrationScript]):
     """
     Custom revision directive to automatically generate revision id's sequentially.
     Reference: https://stackoverflow.com/a/67398484/19517403
