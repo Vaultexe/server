@@ -52,9 +52,12 @@ select = [
     "W",  # pycodestyle warnings
     "F",  # pyflakes
     "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
+    "C",  # flake8 comprehensions
+    "B",  # flake8 bugbear
     "UP", # automatically upgrade syntax for newer versions of the language
+    "ASYNC", # flake8 async
+    "C4", # flake8 omprehensions
+    "ISC", # flake8 implicit str concat
 ]
 
 target-version = "py312"
