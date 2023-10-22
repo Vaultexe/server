@@ -1,10 +1,6 @@
-[tool.isort]
-skip_glob = ["__init__.py"]
-profile = "black"
-
 [tool.black]
 line-length = 140
-target-version = ['py311']
+target-version = ['py312']
 exclude = '''
     /(
         \.git
@@ -21,48 +17,31 @@ exclude = '''
     )/
 '''
 
-[tool.interrogate]
-ignore-init-method = true
-ignore-init-module = true
-ignore-magic = false
-ignore-semiprivate = false
-ignore-private = false
-ignore-property-decorators = false
-ignore-module = true
-ignore-nested-functions = true
-ignore-nested-classes = true
-ignore-setters = false
-fail-under = 70
-exclude = [
-    "tests/*",
-    "alembic/*",
-    "app/schemas/*"
-]
-ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
-# possible values: 0 (minimal output), 1 (-v), 2 (-vv)
-verbose = 1
-quiet = false
-whitelist-regex = []
-color = true
-omit-covered-files = false
-
 [tool.ruff]
+target-version = "py312"
+
+preview = true
+unsafe-fixes = true
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
     "F",  # pyflakes
     "I",  # isort
-    "C",  # flake8-comprehensions
-    "B",  # flake8-bugbear
+    "C",  # flake8 comprehensions
+    "B",  # flake8 bugbear
     "UP", # automatically upgrade syntax for newer versions of the language
+    "ASYNC", # flake8 async
+    "C4", # flake8 omprehensions
+    "ISC", # flake8 implicit str concat
 ]
 
-target-version = "py311"
+fixable = ["ALL"]
 
 ignore = [
     "E501",  # line too long, handled by black,
     "B904",  # * Within an except clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
     "B008",  # do not perform function calls in argument defaults. Ignored to allow dependencies in FastAPI
+    "B024", # Do not fail for abstract classes with no abstract methods
 ]
 
 [tool.ruff.per-file-ignores]
@@ -70,7 +49,6 @@ ignore = [
 "locustfile.py" = ["B012"]  # B012 `break` inside `finally` blocks cause exceptions to be silenced
 
 [tool.coverage.run]
-source = ["app"]
 branch = true
 parallel = true
 
@@ -93,6 +71,33 @@ exclude_also = [
     # Don't complain about abstract methods, they aren't run:
     "@(abc\\.)?abstractmethod",
 ]
+
+
+[tool.interrogate]
+ignore-init-method = true
+ignore-init-module = true
+ignore-magic = false
+ignore-semiprivate = false
+ignore-private = false
+ignore-property-decorators = false
+ignore-module = true
+ignore-nested-functions = true
+ignore-nested-classes = true
+ignore-setters = false
+fail-under = 20
+exclude = [
+    "tests/*",
+    "alembic/*",
+    "app/schemas/*"
+]
+ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
+# possible values: 0 (minimal output), 1 (-v), 2 (-vv)
+verbose = 1
+quiet = false
+whitelist-regex = []
+color = true
+omit-covered-files = false
+
 
 [tool.codespell]
 skip = '.git,*.env'

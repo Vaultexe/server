@@ -1,9 +1,12 @@
 # App
-fastapi==0.103.1
+fastapi==0.104.0
 uvicorn==0.23.2
-pydantic==2.3.0
+pydantic==2.4.2
 pydantic-settings==2.0.3
 email-validator==2.0.0.post2
+python-multipart==0.0.6
+async-timeout==4.0.3
+tenacity==8.2.3
 
 # Email
 sendgrid==6.10.0
@@ -16,8 +19,8 @@ argon2-cffi==23.1.0
 # Database
 asyncpg==0.28.0
 alembic==1.12.0
-SQLAlchemy==2.0.20
+SQLAlchemy==2.0.22
 
 # Cache
-redis[hiredis]==5.0.0
+redis[hiredis]==5.0.1
 rq==1.15.1

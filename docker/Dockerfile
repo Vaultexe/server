@@ -1,5 +1,5 @@
-# Official python:3.11 image
-FROM python:3.11
+# Official python:3.12 image
+FROM python:3.12
 LABEL maintainer="Ahmed Ashraf <ahmedabdou1410@gmail.com>"
 
 # Set the working directory to /app
