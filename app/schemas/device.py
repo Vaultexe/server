@@ -1,6 +1,8 @@
 import datetime as dt
 import uuid
 
+from pydantic import IPvAnyAddress
+
 from app.schemas.base import BaseSchema
 
 
@@ -14,10 +16,7 @@ class Device(BaseSchema):
 
 
 class DeviceCreate(BaseSchema):
-    id: uuid.UUID
     user_id: uuid.UUID
     user_agent: str
-
-
-def user_agent_extract(ua: str) -> dict:
-    """Extracts device id, device type and os from user agent string."""
+    ip: IPvAnyAddress
+    is_verified: bool = False

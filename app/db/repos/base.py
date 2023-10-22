@@ -21,7 +21,7 @@ class BaseRepo[ModelType: BaseModel, CreateSchemaType: BaseSchema](ABC):
         self,
         db: AsyncSession,
         *,
-        id: UUID | int,
+        id: UUID | str | int,
     ) -> ModelType | None:
         """Get model by id"""
         query = sa.select(self.model).filter(self.model.id == id)

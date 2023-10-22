@@ -8,7 +8,7 @@ from .user import (
     User,
 )
 
-from .device import Device
+from .device import Device, DeviceCreate
 
 from .collection import (
     Collection,
@@ -24,9 +24,8 @@ from .token import (
     TokenBase,
     AccessTokenClaim,
     RefreshTokenClaim,
-    WebToken,
     OTPTokenClaim,
-    OTPSaltedHash,
+    OTPSaltedHashClaim,
 )
 
 from .invitation import (
@@ -34,6 +33,9 @@ from .invitation import (
     Invitation,
 )
 
-from .email import RegistrationEmailPayload
+from .email import (
+    RegistrationEmailPayload,
+    OTPEmailPayload,
+)
 
 from .worker_job import WorkerJob

@@ -1,6 +1,7 @@
 import re
 import secrets
 import string
+import uuid
 
 
 def camel_to_snake(text: str) -> str:
@@ -86,3 +87,8 @@ def is_valid_password(password: str) -> bool:
     )
     match = re.match(expression, password)
     return bool(match)
+
+
+def uuid4_str() -> str:
+    """Generates a string uuid4"""
+    return str(uuid.uuid4())

@@ -8,6 +8,7 @@ from sendgrid.helpers.mail import Header, Mail
 
 from app.core.config import settings
 from app.schemas.email import (
+    OTPEmailPayload,
     RegistrationEmailPayload,
 )
 
@@ -58,6 +59,20 @@ def send_registration_email(data: RegistrationEmailPayload) -> EmailResponse:
             "__registration_link__": f"{settings.DOMAIN}/register?token={data.token}",
             "__email__": str(data.to),
             "__expires_in__": str(data.expires_in_hours),
+        },
+    )
+
+
+def send_otp_email(data: OTPEmailPayload) -> EmailResponse:
+    body = read_template("otp.html")
+    return send_email(
+        to_emails=data.to,
+        subject=data.subject,
+        body=body,
+        ccs=data.ccs,
+        environments={
+            "__otp__": str(data.otp),
+            "__expires_at__": data.expires_at.strftime("%Y-%m-%d %H:%M:%S"),
         },
     )
 

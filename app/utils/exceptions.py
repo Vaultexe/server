@@ -15,11 +15,16 @@ class TokenExpiredException(HTTPException):
         )
 
 
-class AuthenticationException(TokenExpiredException):
-    def __init__(self) -> None:
+class AuthenticationException(HTTPException):
+    def __init__(
+        self,
+        detail: str = "Authentication failed",
+        headers: dict[str, str] | None = None,
+    ) -> None:
         super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication failed",
+            detail=detail,
+            headers=headers,
         )
 
 
@@ -36,6 +41,14 @@ class AuthorizationException(HTTPException):
         )
 
 
+class InvalidOTPException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid OTP",
+        )
+
+
 class UserAlreadyActiveException(HTTPException):
     def __init__(self) -> None:
         super().__init__(
@@ -49,4 +62,12 @@ class UserNotFoundException(HTTPException):
         super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="User not found",
+        )
+
+
+class UnverifiedEmailException(HTTPException):
+    def __init__(self) -> None:
+        super().__init__(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified",
         )

@@ -39,3 +39,8 @@ class User(BaseModel):
         """Activate user"""
         self.is_active = True
         return self
+
+    def verify_email(self) -> Self:
+        """Verify email"""
+        self.email_verified = True
+        return self

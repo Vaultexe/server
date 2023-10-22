@@ -19,9 +19,10 @@ def upgrade() -> None:
     """ Create device table """
     op.create_table(
         "device",
-        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("id", sa.String(length=36), nullable=False),
         sa.Column("user_id", sa.UUID(), nullable=False),
         sa.Column("user_agent", sa.String(length=350), nullable=False),
+        sa.Column("is_verified", sa.Boolean(), nullable=False),
         sa.Column("regestered_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("last_login_ip", sa.String(length=45), nullable=False),
         sa.Column("last_login_at", sa.DateTime(timezone=True), nullable=False),
