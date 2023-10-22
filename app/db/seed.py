@@ -8,12 +8,14 @@ import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
 import app.models  # noqa
+from app.api.deps.cache import get_mq_high
+from app.api.routes.v1.invite import setup_inviation
 
 # make sure all SQL Alchemy models are imported (app.model) before initializing DB # noqa
 # otherwise, SQL Alchemy might fail to initialize relationships properly
 # for more details: https://github.com/tiangolo/full-stack-fastapi-postgresql/issues/28 # noqa
 from app.core.config import settings
-from app.db import repos
+from app.db import repos as repo
 from app.db.session import AsyncSessionFactory, async_engine
 from app.schemas import UserInvite
 
@@ -25,25 +27,31 @@ async def init_db() -> None:
     """Seed the database with initial data"""
     echo, async_engine.echo = async_engine.echo, False
     async with AsyncSessionFactory() as session:
-        await _seed_super_user(session)
+        await _invite_super_user(session)
     async_engine.echo = echo
 
 
-async def _seed_super_user(db: AsyncSession) -> None:
+async def _invite_super_user(db: AsyncSession) -> None:
     """Seed super user if not exist"""
-    admin_invite = UserInvite(
-        email=settings.SUPERUSER_EMAIL,
-        is_admin=True,
-    )
+    admin = await repo.user.get_by_email(db, email=settings.SUPERUSER_EMAIL)
 
-    try:
-        await repos.user.create(db, obj_in=admin_invite)
+    if not admin:
+        admin_invite = UserInvite(email=settings.SUPERUSER_EMAIL, is_admin=True)
+        admin = await repo.user.create(db, obj_in=admin_invite)
         await db.commit()
-    except Exception as e:
-        logger.error(e)
-        logger.info("Super user already exists")
+        await db.refresh(admin)
 
-    # TODO: Send an email invitation to the new admin to register his password
+    if admin.is_active:
+        logger.info("Super user already exists")
+        return
+
+    await setup_inviation(
+        db=db,
+        admin=admin,
+        invitee=admin,
+        expires_in_hours=24,
+        mq=get_mq_high(),
+    )
 
 
 async def main() -> None:

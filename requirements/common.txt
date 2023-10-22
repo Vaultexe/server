@@ -4,6 +4,7 @@ uvicorn==0.23.2
 pydantic==2.4.2
 pydantic-settings==2.0.3
 email-validator==2.0.0.post2
+python-multipart==0.0.6
 async-timeout==4.0.3
 tenacity==8.2.3
 

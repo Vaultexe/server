@@ -21,7 +21,7 @@ def upgrade() -> None:
         "invitation",
         sa.Column("token_hash", sa.String(), nullable=False),
         sa.Column("invitee_id", sa.UUID(), nullable=False),
-        sa.Column("created_by", sa.UUID(), nullable=True),
+        sa.Column("created_by", sa.UUID(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("expires_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("is_valid", sa.Boolean(), nullable=False),

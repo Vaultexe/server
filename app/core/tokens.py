@@ -7,7 +7,7 @@ from app.core import security
 from app.core.config import settings
 from app.schemas import (
     AccessTokenClaim,
-    OTPSaltedHash,
+    OTPSaltedHashClaim,
     OTPTokenClaim,
     RefreshTokenClaim,
 )
@@ -50,13 +50,12 @@ def create_web_tokens(
 
 def create_otp_tokens(
     *,
-    subject: uuid.UUID | str,
-    ip: IPvAnyAddress,
     otp: str,
-    otpt_ttl: int = settings.OTP_EXPIRE_SECONDS,
-) -> tuple[OTPSaltedHash, OTPTokenClaim, str]:
+    ip: IPvAnyAddress,
+    subject: uuid.UUID | str,
+) -> tuple[OTPSaltedHashClaim, OTPTokenClaim, str]:
     """
-    Create an OTP token
+    Create an OTP tokens & claims.
 
     It is sent along with the OTP code to the server
     to ensure that the OTP is used from the same device that requested it.
@@ -64,10 +63,10 @@ def create_otp_tokens(
     salt, hash = security.get_salted_hash(otp)
 
     jti, iat = uuid.uuid4(), dt.datetime.now(dt.UTC)
-    exp = iat + dt.timedelta(seconds=otpt_ttl)
+    exp = iat + dt.timedelta(seconds=settings.OTP_EXPIRE_SECONDS)
 
     otpt_claim = OTPTokenClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=exp)
-    otp_sh_claim = OTPSaltedHash(jti=jti, sub=subject, ip=ip, iat=iat, exp=exp, salt=salt, hash=hash)
+    otp_sh_claim = OTPSaltedHashClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=exp, salt=salt, hash=hash)
 
     otpt = security.encode_token(otpt_claim.model_dump())
 

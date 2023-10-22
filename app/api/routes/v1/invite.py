@@ -4,13 +4,13 @@ from typing import Annotated
 
 import rq
 from fastapi import APIRouter, Body, Query, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import schemas
-from app.api.deps import AsyncRedisClientDep, SyncRedisClientDep, dbDep
+from app.api.deps import AdminDep, DbDep, MQDefault
 from app.core.config import settings
 from app.db import repos as repo
 from app.schemas import UserInvite
-from app.schemas.enums import WorkerQueue
 from app.utils.emails import send_registration_email
 from app.utils.exceptions import UserAlreadyActiveException
 from app.utils.mocks import mock_worker_job
@@ -21,12 +21,11 @@ router = APIRouter()
 @router.post(
     "/",
     status_code=status.HTTP_202_ACCEPTED,
-    # TODO: add admin dep permission
 )
 async def invite_user(
-    db: dbDep,
-    rc: AsyncRedisClientDep,
-    rc_sync: SyncRedisClientDep,
+    db: DbDep,
+    mq: MQDefault,
+    admin: AdminDep,
     new_invitee: Annotated[UserInvite, Body(...)],
     expires_in_hours: Annotated[
         int,
@@ -39,15 +38,15 @@ async def invite_user(
     * 24,
 ) -> schemas.WorkerJob:
     """
-    ### Invite a user to join Vaultexe server
+    ## Invite a user to join Vaultexe server
 
-    ### Permissions
+    ## Permissions
     * Inviter is an admin
 
-    ### Prerequisites
+    ## Prerequisites
     * The invitee must not be active yet (i.e. never registered before)
 
-    ### Notes
+    ## Notes
     * A new inactive user will be created for the invitee
     * The invitee will receive an email with a link to activate their account
     * The invitation will expire after 7 days (default)
@@ -57,11 +56,31 @@ async def invite_user(
 
     if not invitee:
         invitee = await repo.user.create(db, obj_in=new_invitee)
+        await db.commit()
+        await db.refresh(invitee)
     elif invitee.is_active:
         raise UserAlreadyActiveException
+    else:
+        await repo.invitation.invalidate_tokens(db, user_id=invitee.id)
 
-    await repo.invitation.invalidate_tokens(db, user_id=invitee.id)
+    return await setup_inviation(
+        mq=mq,
+        db=db,
+        admin=admin,
+        invitee=invitee,
+        expires_in_hours=expires_in_hours,
+    )
 
+
+async def setup_inviation(
+    *,
+    db: AsyncSession,
+    mq: rq.Queue,
+    admin: schemas.User,
+    invitee: schemas.User,
+    expires_in_hours: int,
+) -> schemas.WorkerJob:
+    """Handle invitation tokens & invitation email"""
     invitation_token = uuid.uuid4()
 
     expires_at = dt.datetime.utcnow() + dt.timedelta(hours=expires_in_hours)
@@ -69,7 +88,7 @@ async def invite_user(
     new_invitation = schemas.InvitationCreate(
         token=invitation_token,
         invitee_id=invitee.id,
-        created_by=invitee.id,  # TODO: get current admin id from request
+        created_by=admin.id,
         expires_at=expires_at,
     )
 
@@ -86,9 +105,7 @@ async def invite_user(
         expires_in_hours=expires_in_hours,
     )
 
-    q = rq.Queue(WorkerQueue.LOW.value, connection=rc_sync)
-
-    job = q.enqueue_call(
+    job = mq.enqueue_call(
         func=send_registration_email,
         args=(email_payload,),
         retry=rq.Retry(max=2),

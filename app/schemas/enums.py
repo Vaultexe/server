@@ -1,25 +1,11 @@
-from enum import Enum, auto
+from enum import StrEnum, auto
+from typing import override
 
-from typing_extensions import override
 
-
-class BaseEnum(str, Enum):
+class BaseEnum(StrEnum):
     """
     Base class for all enums
     """
-
-    @override
-    def _generate_next_value_(name, start, count, last_values) -> str:  # type: ignore
-        """
-        Overrides the enum function that generates the next value
-        Uses the name as the automatic value, rather than an integer
-        See https://docs.python.org/3/library/enum.html#using-automatic-values for reference
-        """
-        return name
-
-    @classmethod
-    def as_dict(cls) -> dict:
-        return {e.name: e.value for e in cls}
 
 
 class CipherType(BaseEnum):
@@ -35,6 +21,22 @@ class TokenType(BaseEnum):
 
 
 class WorkerQueue(BaseEnum):
-    HIGH = "high"
-    DEFAULT = "default"
-    LOW = "low"
+    HIGH = auto()
+    DEFAULT = auto()
+    LOW = auto()
+
+
+class CookieKey(BaseEnum):
+    @override
+    def _generate_next_value_(name: str, _, __, ___) -> str:
+        """
+        Overrides the enum function that generates the next value
+        Uses the name as the automatic value, rather than an integer
+        See https://docs.python.org/3/library/enum.html#using-automatic-values for reference
+        """
+        return f"vaultexe_{name.lower()}"
+
+    ACCESS_TOKEN = auto()
+    REFRESH_TOKEN = auto()
+    OTP_TOKEN = auto()
+    DEVICE_ID = auto()
