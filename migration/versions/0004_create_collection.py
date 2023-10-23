@@ -27,9 +27,10 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id", name=op.f("pk_collection")),
     )
     op.create_index(op.f("ix_collection_user_id"), "collection", ["user_id"], unique=False)
-
+    op.create_unique_constraint(op.f("uix_collection_user_id_name"), "collection", ["user_id", "name"])
 
 def downgrade() -> None:
     """Drop collection table table"""
+    op.drop_constraint(op.f("uix_collection_user_id_name"), table_name="collection", type_="unique")
     op.drop_index(op.f("ix_collection_user_id"), table_name="collection")
     op.drop_table("collection")

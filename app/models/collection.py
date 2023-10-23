@@ -13,3 +13,5 @@ class Collection(BaseModel):
     user_id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), sa.ForeignKey("user.id"), index=True, nullable=False)
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
     created_at: Mapped[dt.datetime] = mapped_column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())
+
+    sa.UniqueConstraint(user_id, name, name="uix_collection_user_id_name")
