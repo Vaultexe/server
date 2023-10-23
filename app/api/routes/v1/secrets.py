@@ -6,7 +6,8 @@ from fastapi import APIRouter, Body, Path
 from app import schemas
 from app.api.deps import DbDep, UserDep
 from app.db import repos as repo
-from app.utils.exceptions import EntityNotFoundException
+from app.utils.exceptions import DuplicateEntityException, EntityNotFoundException
+from app import models
 
 router = APIRouter()
 
@@ -25,16 +26,20 @@ async def get_secrets(
 async def create_secret(
     db: DbDep,
     user: UserDep,
-    cipher: Annotated[schemas.CipherCreate, Body(...)],
+    new_cipher: Annotated[schemas.CipherCreate, Body(...)],
 ) -> schemas.Cipher:
-    cipher = await repo.cipher.create(
-        db,
-        obj_in=cipher,
-        user_id=user.id,
-    )
-    await db.commit()
-    await db.refresh(cipher)
-    return schemas.Cipher.model_validate(cipher)
+    try:
+        cipher = await repo.cipher.create(
+            db,
+            user_id=user.id,
+            obj_in=new_cipher,
+        )
+        await db.commit()
+        await db.refresh(cipher)
+        return schemas.Cipher.model_validate(cipher)
+    except Exception:
+        await db.rollback()
+        raise DuplicateEntityException(models.Cipher)
 
 
 @router.put("/{cipher_id}")
