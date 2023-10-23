@@ -21,7 +21,7 @@ repos:
     - --unsafe
 # Ruff is a super fast linter written in Rust.
 - repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.1.0
+  rev: v0.1.1
   hooks:
   - id: ruff
     name: Code linting
@@ -29,7 +29,7 @@ repos:
     - --fix
 # Black is the python code formatter.
 - repo: https://github.com/psf/black
-  rev: 23.9.1
+  rev: 23.10.0
   hooks:
   - id: black
     args: [--config=./pyproject.toml]
