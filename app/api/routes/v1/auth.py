@@ -26,10 +26,10 @@ from app.utils.emails import send_otp_email
 from app.utils.exceptions import (
     AuthenticationException,
     AuthorizationException,
+    EntityNotFoundException,
     InvalidOTPException,
     UnverifiedEmailException,
     UserAlreadyActiveException,
-    UserNotFoundException,
 )
 
 router = APIRouter()
@@ -72,7 +72,7 @@ async def register(
     invitee = await repo.user.get(db, id=invitation.invitee_id)
 
     if not invitee:
-        raise UserNotFoundException
+        raise EntityNotFoundException(models.User)
 
     if invitee.is_active:
         raise UserAlreadyActiveException

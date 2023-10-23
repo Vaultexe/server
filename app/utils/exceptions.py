@@ -71,3 +71,9 @@ class UnverifiedEmailException(HTTPException):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email not verified",
         )
+
+
+class EntityNotFoundException(HTTPException):
+    def __init__(self, model: object | str) -> None:
+        entity = model.__name__ if isinstance(model, object) else model
+        super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=f"{entity} not found")
