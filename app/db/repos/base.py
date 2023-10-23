@@ -3,6 +3,7 @@ from uuid import UUID
 
 import sqlalchemy as sa
 from sqlalchemy.ext.asyncio import AsyncSession
+from typing_extensions import deprecated
 
 from app.models.base import BaseModel
 from app.schemas.base import BaseSchema
@@ -48,3 +49,16 @@ class BaseRepo[ModelType: BaseModel, CreateSchemaType: BaseSchema](ABC):
         db_objs = [self.model.create_from(obj_in) for obj_in in objs_in]
         db.add_all(db_objs)
         return db_objs
+
+    @deprecated("Use it in development only", category=DeprecationWarning)
+    async def _get_all(
+        self,
+        db: AsyncSession,
+        *,
+        filter: sa.sql.ColumnExpressionArgument | None = None,
+    ) -> list[ModelType]:
+        query = sa.select(self.model)
+        if filter is not None:
+            query = query.where(filter)
+        res = await db.scalars(query)
+        return res.all()
