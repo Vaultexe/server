@@ -11,8 +11,9 @@ from .user import (
 from .device import Device, DeviceCreate
 
 from .collection import (
-    Collection,
     CollectionCreate,
+    CollectionUpdate,
+    Collection,
 )
 
 from .cipher import (

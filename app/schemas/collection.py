@@ -1,7 +1,17 @@
 import datetime as dt
 import uuid
 
+from pydantic import ConfigDict
+
 from app.schemas.base import BaseSchema
+
+
+class CollectionCreate(BaseSchema):
+    name: str
+
+
+class CollectionUpdate(BaseSchema):
+    name: str
 
 
 class Collection(BaseSchema):
@@ -10,7 +20,4 @@ class Collection(BaseSchema):
     name: str
     created_at: dt.datetime
 
-
-class CollectionCreate(BaseSchema):
-    user_id: uuid.UUID
-    name: str
+    model_config = ConfigDict(from_attributes=True)
