@@ -41,6 +41,28 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         cipher.soft_delete()
         return cipher
 
+    async def soft_delete_collection(
+        self,
+        db: AsyncSession,
+        *,
+        collection_id: uuid.UUID,
+    ) -> list[uuid.UUID]:
+        """
+        Soft delete all ciphers ina  collection
+        Returns list of cipher ids
+        """
+        query = (
+            sa.update(self.model)
+            .where(self.model.collection_id == collection_id)
+            .values(
+                deleted_at=sa.func.now(),
+                collection_id=None,
+            )
+            .returning(self.model.id)
+        )
+        result = await db.scalars(query)
+        return list(result.all())
+
     @deprecated("Use it in development only", category=DeprecationWarning)
     @override
     async def _get_all(

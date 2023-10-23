@@ -2,7 +2,7 @@ import datetime as dt
 import uuid
 from typing import Self
 
-from pydantic import EmailStr, computed_field, model_validator
+from pydantic import ConfigDict, EmailStr, computed_field, model_validator
 
 from app.core.security import hash_pwd
 from app.schemas.base import BaseSchema
@@ -43,3 +43,5 @@ class User(BaseSchema):
     email_verified: bool
     last_pwd_change: dt.datetime | None
     last_email_change: dt.datetime | None
+
+    model_config = ConfigDict(from_attributes=True)
