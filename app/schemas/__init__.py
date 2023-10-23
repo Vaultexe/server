@@ -16,8 +16,10 @@ from .collection import (
 )
 
 from .cipher import (
-    Cipher,
+    CipherBase,
     CipherCreate,
+    CipherUpdate,
+    Cipher,
 )
 
 from .token import (
