@@ -1,11 +1,28 @@
 import datetime as dt
 import uuid
 
+from pydantic import ConfigDict
+
 from app.schemas.base import BaseSchema
 from app.schemas.enums import CipherType
 
 
-class Cipher(BaseSchema):
+class CipherBase(BaseSchema):
+    pass
+
+
+class CipherCreate(CipherBase):
+    collection_id: uuid.UUID | None = None
+    type: CipherType
+    data: bytes
+
+
+class CipherUpdate(CipherBase):
+    collection_id: uuid.UUID | None = None
+    data: bytes | None = None
+
+
+class Cipher(CipherBase):
     id: uuid.UUID
     user_id: uuid.UUID
     collection_id: uuid.UUID | None
@@ -15,14 +32,4 @@ class Cipher(BaseSchema):
     updated_at: dt.datetime | None
     deleted_at: dt.datetime | None
 
-
-class CipherCreate(BaseSchema):
-    user_id: uuid.UUID
-    collection_id: uuid.UUID | None
-    type: CipherType
-    data: bytes
-
-
-class CipherUpdate(BaseSchema):
-    collection_id: uuid.UUID | None
-    data: bytes | None
+    model_config = ConfigDict(from_attributes=True)
