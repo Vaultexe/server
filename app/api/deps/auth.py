@@ -67,7 +67,7 @@ async def get_current_user(
     """
     at_claim = AccessTokenClaim.from_encoded(token)
 
-    rt_claim = await cache.repo.get_refresh_token_claim(rc=rc, user_id=at_claim.sub)
+    rt_claim = await cache.repo.get_token(rc=rc, key=at_claim.sub, token_cls=AccessTokenClaim)
 
     if rt_claim is None or at_claim.jti != rt_claim.jti or str(req_ip) != str(rt_claim.ip):
         raise AuthenticationException
