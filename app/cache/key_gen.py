@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Self
+
+from app import schemas
 
 
 def rt_key_gen(id: str) -> str:
@@ -25,3 +28,15 @@ class KeyGen(Enum):
     def __call__(self, s: str) -> str:
         """Factory method for the key builders"""
         return self.value(s)
+
+    @classmethod
+    def from_token(cls, token_cls: type[schemas.TokenBase]) -> Self:
+        key_gen = {
+            schemas.RefreshTokenClaim: cls.REFRESH_TOKEN,
+            schemas.OTPSaltedHashClaim: cls.OTP_SALTED_HASH,
+        }.get(token_cls, None)
+
+        if key_gen is None:
+            raise ValueError(f"Invalid token type: {token_cls}")
+
+        return key_gen

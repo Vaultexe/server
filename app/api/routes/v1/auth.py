@@ -18,6 +18,7 @@ from app.api.deps import (
 )
 from app.api.deps.cache import MQHigh
 from app.cache.client import AsyncRedisClient
+from app.cache.key_gen import KeyGen
 from app.core import security, tokens
 from app.core.config import settings
 from app.db import repos as repo
@@ -27,6 +28,7 @@ from app.utils.exceptions import (
     AuthenticationException,
     AuthorizationException,
     InvalidOTPException,
+    TokenExpiredException,
     UnverifiedEmailException,
     UserAlreadyActiveException,
     UserNotFoundException,
@@ -192,7 +194,10 @@ async def otp_login(
     * **vaultexe_access_token**
     * **vaultexe_refresh_token**
     """
-    otp_sh_claim = await cache.repo.get_otp_sh_claim(rc, user_id=user.id)
+    otp_sh_claim = await cache.repo.get_token(rc, key=user.id, token_cls=schemas.OTPSaltedHashClaim)
+
+    if not otp_sh_claim:
+        raise TokenExpiredException
 
     is_valid_otp = security.verify_salted_hash(otp, otp_sh_claim.salt, otp_sh_claim.hash)
 
@@ -202,7 +207,7 @@ async def otp_login(
     if str(otp_sh_claim.ip) != ip:
         raise AuthenticationException
 
-    await cache.repo.delete_otp_sh_claim(rc, user_id=user.id)
+    await cache.repo.delete_token(rc, key=user.id, key_gen=KeyGen.OTP_SALTED_HASH)
 
     return await grant_web_token(rc=rc, user=user, ip=ip, res=res)
 
@@ -231,11 +236,10 @@ async def grant_web_token(
         is_admin=user.is_admin,
     )
 
-    await cache.repo.save_refresh_token_claim(
+    await cache.repo.save_token_claim(
         rc,
-        user_id=user.id,
-        rt_claim=rt_claim,
-        reset_ttl=True,
+        key=user.id,
+        token_claim=rt_claim,
     )
 
     res.status_code = status.HTTP_200_OK
@@ -288,7 +292,7 @@ async def grant_autherization_code(
         subject=user.id,
     )
 
-    await cache.repo.save_otp_sh_claim(rc, user_id=user.id, otp_sh_claim=otp_sh_claim)
+    await cache.repo.save_token_claim(rc, key=user.id, token_claim=otp_sh_claim)
 
     email_payload = schemas.OTPEmailPayload(
         otp=otp,
