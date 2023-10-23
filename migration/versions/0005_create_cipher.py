@@ -27,7 +27,7 @@ def upgrade() -> None:
         sa.Column("type", PgCipherType, nullable=False),
         sa.Column("data", sa.LargeBinary(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True),
+        sa.Column("updated_at", sa.DateTime(timezone=True), nullable=True, onupdate=sa.text("now()")),
         sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True),
         sa.ForeignKeyConstraint(["collection_id"], ["collection.id"], name=op.f("fk_cipher_collection_id_collection")),
         sa.ForeignKeyConstraint(["user_id"], ["user.id"], name=op.f("fk_cipher_user_id_user")),
