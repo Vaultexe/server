@@ -10,7 +10,7 @@ from app.api.deps.cache import AsyncRedisClientDep
 from app.api.deps.db import DbDep
 from app.db import repos as repo
 from app.schemas.enums import CookieKey
-from app.schemas.token import AccessTokenClaim, OTPTokenClaim
+from app.schemas.token import AccessTokenClaim, OTPTokenClaim, RefreshTokenClaim
 from app.utils.exceptions import (
     AuthenticationException,
     AuthorizationException,
@@ -67,7 +67,7 @@ async def get_current_user(
     """
     at_claim = AccessTokenClaim.from_encoded(token)
 
-    rt_claim = await cache.repo.get_token(rc=rc, key=at_claim.sub, token_cls=AccessTokenClaim)
+    rt_claim = await cache.repo.get_token(rc=rc, key=at_claim.sub, token_cls=RefreshTokenClaim)
 
     if rt_claim is None or at_claim.jti != rt_claim.jti or str(req_ip) != str(rt_claim.ip):
         raise AuthenticationException
