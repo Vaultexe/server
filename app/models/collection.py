@@ -9,9 +9,11 @@ from app.models import BaseModel
 
 
 class Collection(BaseModel):
+    # fmt: off
     id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), sa.ForeignKey("user.id"), index=True, nullable=False)
     name: Mapped[str] = mapped_column(sa.String, nullable=False)
     created_at: Mapped[dt.datetime] = mapped_column(sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now())
+    # fmt: on
 
     sa.UniqueConstraint(user_id, name, name="uix_collection_user_id_name")

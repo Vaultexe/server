@@ -37,6 +37,10 @@ DICT_CONFIG = {
         },
     },
     "loggers": {
-        "root": {"handlers": ["default"], "level": "INFO", "propagate": False},  # root logger
+        "root": {
+            "handlers": ["default"],
+            "level": "INFO",
+            "propagate": False,
+        },  # root logger
     },
 }

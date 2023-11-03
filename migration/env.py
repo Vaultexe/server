@@ -54,10 +54,10 @@ def process_revision_directives(context: context, _, directives: list[MigrationS
         new_rev_id = 1
     else:
         # default branch with incrementation
-        last_rev_id = int(head_revision.lstrip('0'))
+        last_rev_id = int(head_revision.lstrip("0"))
         new_rev_id = last_rev_id + 1
     # fill zeros up to 4 digits: 1 -> 0001
-    migration_script.rev_id = f'{new_rev_id:04}'
+    migration_script.rev_id = f"{new_rev_id:04}"
 
 
 def run_migrations_offline() -> None:

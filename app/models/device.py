@@ -19,6 +19,7 @@ https://stackoverflow.com/questions/166132/maximum-length-of-the-textual-represe
 
 
 class Device(BaseModel):
+    # fmt: off
     id: Mapped[str] = mapped_column(primary_key=True, index=True, default=uuid4_str)
     user_id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), ForeignKey("user.id"), index=True, nullable=False)
     is_verified: Mapped[bool] = mapped_column(nullable=False, default=False)
@@ -26,6 +27,7 @@ class Device(BaseModel):
     regestered_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     last_login_ip: Mapped[IPvAnyAddress] = mapped_column(String(length=45), nullable=False)
     last_login_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    # fmt: on
 
     def refresh_last_login(self, ip: IPvAnyAddress) -> Self:
         self.last_login_ip = str(ip)

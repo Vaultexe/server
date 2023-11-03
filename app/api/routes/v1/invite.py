@@ -34,8 +34,7 @@ async def invite_user(
             alias="expires_in",
             description="hours",
         ),
-    ] = 7
-    * 24,
+    ] = 7 * 24,
 ) -> schemas.WorkerJob:
     """
     ## Invite a user to join Vaultexe server

@@ -19,6 +19,7 @@ from app.models import BaseModel
 
 
 class User(BaseModel):
+    # fmt: off
     id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     email: Mapped[str] = mapped_column(String(length=100), nullable=False, unique=True)
     email_verified: Mapped[bool] = mapped_column(nullable=False, default=False)
@@ -29,6 +30,7 @@ class User(BaseModel):
     last_pwd_change: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_email_change: Mapped[dt.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    # fmt: on
 
     def update_password(self, password: str) -> Self:
         """Hashes the already 2 time KDF hash of master password client side"""

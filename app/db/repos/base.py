@@ -39,7 +39,12 @@ class BaseRepo[ModelType: BaseModel, CreateSchemaType: BaseSchema](ABC):
         db.add(db_obj)
         return db_obj
 
-    async def bulk_create(self, db: AsyncSession, *, objs_in: list[CreateSchemaType]) -> list[ModelType]:
+    async def bulk_create(
+        self,
+        db: AsyncSession,
+        *,
+        objs_in: list[CreateSchemaType],
+    ) -> list[ModelType]:
         """
         Bulk create new models.
 

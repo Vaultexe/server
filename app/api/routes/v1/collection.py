@@ -1,15 +1,15 @@
 import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Path, status
+from fastapi import APIRouter, Body, Path, status
 
-from app import schemas
+from app import models, schemas
 from app.api.deps import DbDep, UserDep
 from app.db import repos as repo
-from app.utils.exceptions import EntityNotFoundException, DuplicateEntityException
-from app import models
+from app.utils.exceptions import DuplicateEntityException, EntityNotFoundException
 
 router = APIRouter()
+
 
 @router.get("/")
 async def get_collections(
@@ -25,14 +25,9 @@ async def get_collections(
     "/",
     status_code=status.HTTP_201_CREATED,
     responses={
-        status.HTTP_409_CONFLICT: {
-            "description": "Collection already exists"
-        },
-        status.HTTP_201_CREATED: {
-            "description": "Collection created"
-        },
+        status.HTTP_409_CONFLICT: {"description": "Collection already exists"},
+        status.HTTP_201_CREATED: {"description": "Collection created"},
     },
-        
 )
 async def create_collection(
     db: DbDep,
@@ -77,7 +72,7 @@ async def delete_collection(
 ) -> list[uuid.UUID]:
     """
     ## Delete collection & Soft delete all ciphers in it
-    
+
     ## Overview
     - Delete collection
     - Detach all ciphers from collection and soft delete them

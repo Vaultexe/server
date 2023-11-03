@@ -40,9 +40,13 @@ class CacheRepo:
 
         return await rc.set(key, token_claim, ttl=ttl)
 
-    async def get_token[
-        T: TokenBase
-    ](self, rc: AsyncRedisClient, *, key: uuid.UUID | str, token_cls: type[T],) -> T | None:
+    async def get_token[T: TokenBase](
+        self,
+        rc: AsyncRedisClient,
+        *,
+        key: uuid.UUID | str,
+        token_cls: type[T],
+    ) -> T | None:
         """Get token claim"""
         key_gen = KeyGen.from_token(token_cls)
         key = key_gen(key)

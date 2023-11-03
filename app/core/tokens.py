@@ -66,7 +66,15 @@ def create_otp_tokens(
     exp = iat + dt.timedelta(seconds=settings.OTP_EXPIRE_SECONDS)
 
     otpt_claim = OTPTokenClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=exp)
-    otp_sh_claim = OTPSaltedHashClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=exp, salt=salt, hash=hash)
+    otp_sh_claim = OTPSaltedHashClaim(
+        ip=ip,
+        jti=jti,
+        iat=iat,
+        exp=exp,
+        hash=hash,
+        salt=salt,
+        sub=subject,
+    )
 
     otpt = security.encode_token(otpt_claim.model_dump())
 

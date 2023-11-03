@@ -167,7 +167,14 @@ async def oauth2_login(
         await db.commit()
         return await grant_web_token(rc=rc, user=user, ip=req_ip, res=res)
     else:
-        await register_new_device(db=db, user_id=user.id, ip=req_ip, user_agent=req_user_agent, res=res)
+        await register_new_device(
+            db=db,
+            res=res,
+            ip=req_ip,
+            user_id=user.id,
+            user_agent=req_user_agent,
+        )
+
         return await grant_autherization_code(rc=rc, mq=mq, user=user, ip=req_ip, res=res)
 
 

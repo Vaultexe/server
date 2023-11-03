@@ -3,11 +3,10 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, Path
 
-from app import schemas
+from app import models, schemas
 from app.api.deps import DbDep, UserDep
 from app.db import repos as repo
 from app.utils.exceptions import DuplicateEntityException, EntityNotFoundException
-from app import models
 
 router = APIRouter()
 
