@@ -75,11 +75,11 @@ class UnverifiedEmailException(HTTPException):
 
 class EntityNotFoundException(HTTPException):
     def __init__(self, model: object | str) -> None:
-        entity = model.__name__ if isinstance(model, object) else model
+        entity = model.__class__.__name__ if isinstance(model, object) else model
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=f"{entity} not found")
 
 
 class DuplicateEntityException(HTTPException):
     def __init__(self, model: object | str) -> None:
-        entity = model.__name__ if isinstance(model, object) else model
+        entity = model.__class__.__name__ if isinstance(model, object) else model
         super().__init__(status_code=status.HTTP_409_CONFLICT, detail=f"{entity} already exists")
