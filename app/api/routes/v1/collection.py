@@ -52,7 +52,7 @@ async def create_collection(
 async def update_collection(
     db: DbDep,
     _: UserDep,
-    collection_id: Annotated[uuid.UUID | str, Path(...)],
+    collection_id: Annotated[uuid.UUID, Path(...)],
     collection_update: Annotated[schemas.CollectionUpdate, Body(...)],
 ) -> schemas.Collection:
     collection = await repo.collection.get(db, id=collection_id)
@@ -68,7 +68,7 @@ async def update_collection(
 async def delete_collection(
     db: DbDep,
     _: UserDep,
-    collection_id: Annotated[uuid.UUID | str, Path(...)],
+    collection_id: Annotated[uuid.UUID, Path(...)],
 ) -> list[uuid.UUID]:
     """
     ## Delete collection & Soft delete all ciphers in it

@@ -81,7 +81,7 @@ def create_otp_tokens(
     return otp_sh_claim, otpt_claim, otpt
 
 
-def create_reset_pwd_token() -> tuple[str, str]:
+def create_reset_pwd_token() -> tuple[uuid.UUID, str]:
     """
     Create a reset password token.
 

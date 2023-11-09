@@ -21,8 +21,8 @@ from app.utils.exceptions import (
 def get_ip(req: Request) -> IPvAnyAddress:
     """Returns the IP address of the client making the request"""
     if ip := req.headers.get("X-Forwarded-For"):
-        return ip.split(",", 1)[0]  # type: ignore
-    return req.client.host  # type: ignore
+        return IPvAnyAddress(ip.split(",", 1)[0])
+    return IPvAnyAddress(req.client.host)  # type: ignore
 
 
 def get_user_agent(req: Request) -> str:
@@ -38,19 +38,31 @@ OTPTokenCookieDep = Annotated[str | None, Cookie(alias=CookieKey.OTP_TOKEN)]
 AccessTokenCookieDep = Annotated[str | None, Cookie(alias=CookieKey.ACCESS_TOKEN)]
 
 
-async def get_current_device(
+async def get_curr_device(
     db: DbDep,
     device_id: DeviceIDCookieDep = None,
+) -> models.Device | None:
+    """
+    Returns the device making the request
+    if it was registered in the system
+    else None
+    """
+    if device_id:
+        device = await repo.device.get(db, id=device_id)
+        return device
+    return None
+
+
+async def get_curr_verified_device(
+    device: Annotated[models.Device | None, Depends(get_curr_device)],
 ) -> models.Device | None:
     """
     Returns the device making the request
     if it was registered & verified in the system
     else None
     """
-    if device_id:
-        device = await repo.device.get(db, id=device_id)
-        if device and device.is_verified:
-            return device
+    if device and device.is_verified:
+        return device
     return None
 
 
@@ -58,6 +70,7 @@ async def get_current_user(
     rc: AsyncRedisClientDep,
     db: DbDep,
     req_ip: ReqIpDep,
+    device_id: DeviceIDCookieDep = None,
     token: AccessTokenCookieDep = None,
 ) -> models.User:
     """
@@ -65,11 +78,14 @@ async def get_current_user(
     with the given access token
     if it is still valid
     """
+    if not token:
+        raise AuthenticationException
+
     at_claim = AccessTokenClaim.from_encoded(token)
 
     rt_claim = await cache.repo.get_token(
         rc=rc,
-        key=at_claim.sub,
+        key=str((at_claim.sub, device_id)),
         token_cls=RefreshTokenClaim,
     )
 
@@ -105,12 +121,15 @@ async def get_otp_user(
     with the given OTP token
     if it is still valid
     """
+    if not token:
+        raise AuthenticationException
+
     otp_claim = OTPTokenClaim.from_encoded(token)
 
     if otp_claim.exp < dt.datetime.now(dt.UTC):
         raise TokenExpiredException
 
-    user = await repo.user.get(db, id=otp_claim.sub)
+    user = await repo.user.get(db, id=str(otp_claim.sub))
 
     if not user:
         raise AuthenticationException
@@ -118,7 +137,8 @@ async def get_otp_user(
     return user
 
 
-ReqDeviceDep = Annotated[models.Device | None, Depends(get_current_device)]
+ReqDeviceDep = Annotated[models.Device | None, Depends(get_curr_device)]
+ReqVerifiedDeviceDep = Annotated[models.Device | None, Depends(get_curr_verified_device)]
 OAuth2PasswordRequestFormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 OTPUserDep = Annotated[models.User, Depends(get_otp_user)]
 UserDep = Annotated[models.User, Depends(get_current_user)]

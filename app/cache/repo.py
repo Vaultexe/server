@@ -1,5 +1,3 @@
-import uuid
-
 from app.cache.client import AsyncRedisClient
 from app.cache.key_gen import KeyGen
 from app.core.config import settings
@@ -13,9 +11,10 @@ class CacheRepo:
         self,
         rc: AsyncRedisClient,
         *,
-        key: uuid.UUID | str,
+        key: str,
         token_claim: TokenBase,
         keep_ttl: bool = False,
+        hash_key=False,
     ) -> bool:
         """
         Cache token claim.
@@ -25,18 +24,20 @@ class CacheRepo:
         If the keep_ttl is set to True, the ttl is not changed when the token is updated.
         However if the token is not found in the cache, the ttl is set to the token's ttl.
 
+        If the hash_key is set to True, the key will be md5 hashed before being cached.
+
         Returns:
             bool: True if successful, False otherwise.
         """
         key_gen = KeyGen.from_token(type(token_claim))
-        key = key_gen(key)
+        key = key_gen(key, hash_key=hash_key)
 
         if keep_ttl:
             rt_exists = await rc.exists(key)
             if rt_exists:
                 return await rc.set(key, token_claim, keepttl=True)
 
-        ttl = self._get_token_ttl(type(token_claim))
+        ttl = self._get_token_type_ttl(type(token_claim))
 
         return await rc.set(key, token_claim, ttl=ttl)
 
@@ -44,12 +45,13 @@ class CacheRepo:
         self,
         rc: AsyncRedisClient,
         *,
-        key: uuid.UUID | str,
+        key: str,
         token_cls: type[T],
+        is_hashed_key: bool = False,
     ) -> T | None:
         """Get token claim"""
         key_gen = KeyGen.from_token(token_cls)
-        key = key_gen(key)
+        key = key_gen(key, hash_key=is_hashed_key)
         token = await rc.get(key)
         return token_cls.model_validate(token) if token else None
 
@@ -57,17 +59,19 @@ class CacheRepo:
         self,
         rc: AsyncRedisClient,
         *,
-        key: uuid.UUID | str,
+        key: str,
         key_gen: KeyGen,
+        is_hashed_key: bool = False,
     ) -> bool:
         """Delete token claim from redis"""
-        key = key_gen(key)
+        key = key_gen(key, hash_key=is_hashed_key)
         return await rc.delete(key)
 
-    def _get_token_ttl(self, token_cls: type[TokenBase]) -> int:
+    def _get_token_type_ttl(self, token_cls: type[TokenBase]) -> int:
         ttl = {
             RefreshTokenClaim: settings.REFRESH_TOKEN_EXPIRE_SECONDS,
             OTPSaltedHashClaim: settings.OTP_EXPIRE_SECONDS,
+            TokenBase: None,
         }.get(token_cls, None)
 
         if ttl is None:

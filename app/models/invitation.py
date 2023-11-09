@@ -22,7 +22,7 @@ class Invitation(BaseModel):
 
     @property
     def is_expired(self) -> bool:
-        return self.expires_at > dt.datetime.now(dt.UTC)
+        return self.expires_at < dt.datetime.now(dt.UTC)
 
     @override
     @classmethod

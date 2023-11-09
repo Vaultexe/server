@@ -131,14 +131,19 @@ async def table_exact_count(db: AsyncSession, *, model: type[BaseModel]) -> int:
     return result.scalar_one()
 
 
-async def table_count(db: AsyncSession, threshold: int = 10000) -> ResultCount:
+async def table_count(
+    db: AsyncSession,
+    *,
+    model: type[BaseModel],
+    threshold: int = 10000,
+) -> ResultCount:
     """
     Get exact or approximate count of records.
 
     If the approximate count < threshold, the exact count is returned.
     """
-    count, is_exact = await table_approx_count(db), False
+    count, is_exact = await table_approx_count(db, model=model), False
     if count < threshold:
         is_exact = True
-        count = await table_exact_count(db)
+        count = await table_exact_count(db, model=model)
     return ResultCount(count, is_exact)

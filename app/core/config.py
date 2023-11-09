@@ -65,4 +65,4 @@ class Settings(BaseSettings):
         return self.is_prod or self.EMAILS_ENABLED
 
 
-settings = Settings()
+settings = Settings()  # type: ignore

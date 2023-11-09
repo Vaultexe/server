@@ -6,6 +6,7 @@ from .auth import (
     ReqDeviceDep,
     ReqIpDep,
     ReqUserAgentDep,
+    ReqVerifiedDeviceDep,
     UserDep,
 )
 from .cache import AsyncRedisClientDep, MQDefault, MQHigh, MQLow, SyncRedisClientDep

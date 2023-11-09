@@ -12,10 +12,11 @@ from app.api.deps import (
     DbDep,
     OAuth2PasswordRequestFormDep,
     OTPUserDep,
-    ReqDeviceDep,
     ReqIpDep,
     ReqUserAgentDep,
+    ReqVerifiedDeviceDep,
 )
+from app.api.deps.auth import DeviceIDCookieDep
 from app.api.deps.cache import MQHigh
 from app.cache.client import AsyncRedisClient
 from app.cache.key_gen import KeyGen
@@ -68,7 +69,7 @@ async def register(
     """
     invitation = await repo.invitation.get_by_token(db, token=registration_token)
 
-    if not invitation or not invitation.is_valid:
+    if not invitation or not invitation.is_valid or invitation.is_expired:
         raise AuthorizationException
 
     invitee = await repo.user.get(db, id=invitation.invitee_id)
@@ -114,7 +115,7 @@ async def oauth2_login(
     mq: MQHigh,
     req_ip: ReqIpDep,
     req_user_agent: ReqUserAgentDep,
-    req_device: ReqDeviceDep,
+    req_device: ReqVerifiedDeviceDep,
     rc: AsyncRedisClientDep,
     form_data: OAuth2PasswordRequestFormDep,
     res: Response,
@@ -165,7 +166,7 @@ async def oauth2_login(
     if req_device and req_device.user_agent == req_user_agent:
         req_device.refresh_last_login(ip=req_ip)
         await db.commit()
-        return await grant_web_token(rc=rc, user=user, ip=req_ip, res=res)
+        return await grant_web_token(rc=rc, user=user, ip=req_ip, device_id=req_device.id, res=res)
     else:
         await register_new_device(
             db=db,
@@ -174,17 +175,18 @@ async def oauth2_login(
             user_id=user.id,
             user_agent=req_user_agent,
         )
-
         return await grant_autherization_code(rc=rc, mq=mq, user=user, ip=req_ip, res=res)
 
 
 @router.post("/otp")
 async def otp_login(
+    db: DbDep,
     rc: AsyncRedisClientDep,
     ip: ReqIpDep,
     user: OTPUserDep,
-    otp: Annotated[str, Body(...)],
     res: Response,
+    otp: Annotated[str, Body(...)],
+    req_device_id: DeviceIDCookieDep = None,
 ) -> Response:
     """
     ## OTP login
@@ -201,7 +203,14 @@ async def otp_login(
     * **vaultexe_access_token**
     * **vaultexe_refresh_token**
     """
-    otp_sh_claim = await cache.repo.get_token(rc, key=user.id, token_cls=schemas.OTPSaltedHashClaim)
+    if not req_device_id:
+        raise AuthenticationException
+
+    otp_sh_claim = await cache.repo.get_token(
+        rc,
+        key=str(user.id),
+        token_cls=schemas.OTPSaltedHashClaim,
+    )
 
     if not otp_sh_claim:
         raise TokenExpiredException
@@ -211,18 +220,23 @@ async def otp_login(
     if not is_valid_otp:
         raise InvalidOTPException
 
-    if str(otp_sh_claim.ip) != ip:
+    if otp_sh_claim.ip != ip:
         raise AuthenticationException
 
-    await cache.repo.delete_token(rc, key=user.id, key_gen=KeyGen.OTP_SALTED_HASH)
+    await cache.repo.delete_token(rc, key=str(user.id), key_gen=KeyGen.OTP_SALTED_HASH)
 
-    return await grant_web_token(rc=rc, user=user, ip=ip, res=res)
+    await repo.device.verify(db, id=req_device_id)
+    await db.commit()
+
+    return await grant_web_token(rc=rc, user=user, ip=ip, device_id=req_device_id, res=res)
 
 
 async def grant_web_token(
+    *,
     rc: AsyncRedisClient,
     user: models.User,
     ip: IPvAnyAddress,
+    device_id: str,
     res: Response,
 ) -> Response:
     """
@@ -245,8 +259,8 @@ async def grant_web_token(
 
     await cache.repo.save_token_claim(
         rc,
-        key=user.id,
         token_claim=rt_claim,
+        key=str((str(user.id), device_id)),
     )
 
     res.status_code = status.HTTP_200_OK
@@ -299,7 +313,7 @@ async def grant_autherization_code(
         subject=user.id,
     )
 
-    await cache.repo.save_token_claim(rc, key=user.id, token_claim=otp_sh_claim)
+    await cache.repo.save_token_claim(rc, key=str(user.id), token_claim=otp_sh_claim)
 
     email_payload = schemas.OTPEmailPayload(
         otp=otp,

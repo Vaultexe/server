@@ -25,7 +25,7 @@ class Device(BaseModel):
     is_verified: Mapped[bool] = mapped_column(nullable=False, default=False)
     user_agent: Mapped[str] = mapped_column(String(length=350), nullable=False)
     regestered_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
-    last_login_ip: Mapped[IPvAnyAddress] = mapped_column(String(length=45), nullable=False)
+    last_login_ip: Mapped[str] = mapped_column(String(length=45), nullable=False)
     last_login_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     # fmt: on
 
@@ -39,7 +39,7 @@ class Device(BaseModel):
         return self
 
     @override
-    def import_from(self, obj: schemas.DeviceCreate) -> Self:
+    def import_from(self, obj: schemas.DeviceCreate) -> None:
         self.refresh_last_login(obj.ip)
         del obj.ip
-        return super().import_from(obj)
+        super().import_from(obj)
