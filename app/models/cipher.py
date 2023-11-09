@@ -25,7 +25,7 @@ class Cipher(BaseModel):
     # fmt: on
     @override
     def import_from(self, obj: schemas.CipherBase) -> None:
-        return super().import_from(obj, exclude_unset=True)
+        super().import_from(obj, exclude_unset=True)
 
     def soft_delete(self) -> None:
         self.deleted_at = dt.datetime.now(dt.UTC)
