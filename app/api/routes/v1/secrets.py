@@ -45,7 +45,7 @@ async def create_secret(
 async def update_secret(
     db: DbDep,
     _: UserDep,
-    cipher_id: Annotated[uuid.UUID | str, Path(...)],
+    cipher_id: Annotated[uuid.UUID, Path(...)],
     cipher_update: Annotated[schemas.CipherUpdate, Body(...)],
 ) -> schemas.Cipher:
     cipher = await repo.cipher.get(db, id=cipher_id)
@@ -61,7 +61,7 @@ async def update_secret(
 async def delete_secret(
     db: DbDep,
     _: UserDep,
-    cipher_id: Annotated[uuid.UUID | str, Path(...)],
+    cipher_id: Annotated[uuid.UUID, Path(...)],
 ) -> schemas.Cipher:
     cipher = await repo.cipher.soft_delete(db, id=cipher_id)
     if not cipher:
