@@ -6,7 +6,7 @@ import rq
 from fastapi import APIRouter, Body, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app import schemas
+from app import models, schemas
 from app.api.deps import AdminDep, DbDep, MQDefault
 from app.core.config import settings
 from app.db import repos as repo
@@ -75,8 +75,8 @@ async def setup_inviation(
     *,
     db: AsyncSession,
     mq: rq.Queue,
-    admin: schemas.User,
-    invitee: schemas.User,
+    admin: models.User,
+    invitee: models.User,
     expires_in_hours: int,
 ) -> schemas.WorkerJob:
     """Handle invitation tokens & invitation email"""
