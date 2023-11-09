@@ -37,7 +37,7 @@ class CollectionRepo(BaseRepo[models.Collection, schemas.CollectionCreate]):
         db: AsyncSession,
         *,
         user_id: uuid.UUID,
-    ) -> list[models.Cipher]:
+    ) -> list[models.Collection]:
         filters = self.model.user_id == user_id
         return await super()._get_all(db, filter=filters)
 
