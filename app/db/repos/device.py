@@ -11,14 +11,25 @@ from app.db.repos.base import BaseRepo
 class DeviceRepo(BaseRepo[models.Device, schemas.DeviceCreate]):
     """Device repo"""
 
+    async def verify(
+        self,
+        db: AsyncSession,
+        *,
+        id: str,
+    ) -> bool:
+        """Verify device"""
+        query = sa.update(models.Device).where(models.Device.id == id).values(is_verified=True)
+        result: sa.CursorResult = await db.execute(query)
+        return bool(result.rowcount)
+
     async def clear_redundant_devices(
         self,
         db: AsyncSession,
         *,
         user_id: uuid.UUID,
-        ip: IPvAnyAddress | str,
+        ip: IPvAnyAddress,
         user_agent: str,
-        exclude_id: uuid.UUID = None,
+        exclude_id: str | None = None,
     ) -> int:
         """
         Clears redundant unverified devices
@@ -31,7 +42,7 @@ class DeviceRepo(BaseRepo[models.Device, schemas.DeviceCreate]):
                 models.Device.user_id == user_id,
                 models.Device.last_login_ip == ip,
                 models.Device.user_agent == user_agent,
-                models.Device.is_verified is False,
+                models.Device.is_verified is False,  # type: ignore
                 models.Device.id != exclude_id,
             )
         )

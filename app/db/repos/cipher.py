@@ -71,7 +71,7 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         *,
         user_id: uuid.UUID,
     ) -> list[models.Cipher]:
-        filters = sa.and_(self.model.user_id == user_id, self.model.deleted_at is None)
+        filters = sa.and_(self.model.user_id == user_id, self.model.deleted_at is None)  # type: ignore
         return await super()._get_all(db, filter=filters)
 
 
