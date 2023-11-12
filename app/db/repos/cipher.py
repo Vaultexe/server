@@ -7,7 +7,7 @@ from typing_extensions import deprecated
 
 from app import models, schemas
 from app.db.repos.base import BaseRepo
-from app.schemas.cipher import CipherCreate
+
 
 
 class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
@@ -19,7 +19,7 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         db: AsyncSession,
         *,
         user_id: uuid.UUID,
-        obj_in: CipherCreate,
+        obj_in: schemas.CipherCreate,
     ) -> models.Cipher:
         cipher = await super().create(db, obj_in=obj_in)
         cipher.user_id = user_id

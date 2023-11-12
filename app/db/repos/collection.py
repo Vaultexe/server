@@ -7,7 +7,6 @@ from typing_extensions import deprecated
 
 from app import models, schemas
 from app.db.repos.base import BaseRepo
-from app.schemas.collection import CollectionCreate
 
 
 class CollectionRepo(BaseRepo[models.Collection, schemas.CollectionCreate]):
@@ -19,7 +18,7 @@ class CollectionRepo(BaseRepo[models.Collection, schemas.CollectionCreate]):
         db: AsyncSession,
         *,
         user_id: uuid.UUID,
-        obj_in: CollectionCreate,
+        obj_in: schemas.CollectionCreate,
     ) -> models.Collection:
         collection = await super().create(db, obj_in=obj_in)
         collection.user_id = user_id
