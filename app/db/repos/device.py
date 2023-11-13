@@ -22,6 +22,19 @@ class DeviceRepo(BaseRepo[models.Device, schemas.DeviceCreate]):
         result: sa.CursorResult = await db.execute(query)
         return bool(result.rowcount)
 
+    async def is_verified(
+        self,
+        db: AsyncSession,
+        *,
+        id: str | None,
+    ) -> bool:
+        """Check if device is verified"""
+        if not id:
+            return False
+        query = sa.select(models.Device.is_verified).where(models.Device.id == id)
+        result: sa.Result = await db.execute(query)
+        return bool(result.scalar_one())
+
     async def clear_redundant_devices(
         self,
         db: AsyncSession,
