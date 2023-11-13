@@ -21,7 +21,7 @@ def encode_token(claim: dict[str, Any]) -> str:
     )
 
 
-def decode_token(token: str) -> dict[str, Any]:
+def decode_token(token: str, *, allow_expired: bool = False) -> dict[str, Any]:
     """
     Decode a JWT token.
 
@@ -43,6 +43,7 @@ def decode_token(token: str) -> dict[str, Any]:
             token,
             settings.JWT_SECRET_KEY,
             algorithms=settings.JWT_HASHING_ALGORITHM,
+            options={"verify_exp": not allow_expired},
         )
     except jwt_errors.ExpiredSignatureError:
         raise TokenExpiredException
