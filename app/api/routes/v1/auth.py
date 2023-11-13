@@ -181,7 +181,6 @@ async def oauth2_login(
 
 @router.post("/refresh")
 async def refresh(
-    db: DbDep,
     res: Response,
     req_ip: ReqIpDep,
     user: RefreshUserDep,
