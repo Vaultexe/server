@@ -12,6 +12,7 @@ from app.api.deps import (
     DbDep,
     OAuth2PasswordRequestFormDep,
     OTPUserDep,
+    RefreshUserDep,
     ReqIpDep,
     ReqUserAgentDep,
     ReqVerifiedDeviceDep,
@@ -114,9 +115,9 @@ async def oauth2_login(
     db: DbDep,
     mq: MQHigh,
     req_ip: ReqIpDep,
+    rc: AsyncRedisClientDep,
     req_user_agent: ReqUserAgentDep,
     req_device: ReqVerifiedDeviceDep,
-    rc: AsyncRedisClientDep,
     form_data: OAuth2PasswordRequestFormDep,
     res: Response,
 ) -> Response:
@@ -178,13 +179,49 @@ async def oauth2_login(
         return await grant_autherization_code(rc=rc, mq=mq, user=user, ip=req_ip, res=res)
 
 
+@router.post("/refresh")
+async def refresh(
+    db: DbDep,
+    res: Response,
+    req_ip: ReqIpDep,
+    user: RefreshUserDep,
+    rc: AsyncRedisClientDep,
+    req_device_id: DeviceIDCookieDep = None,
+) -> Response:
+    """
+    ## Refresh access token
+
+    ## Prerequisites
+    * User has been authenticated via oauth2 login
+    * User Device/Browser is registered & verified
+
+    ## Overview
+    * Validates refresh & the expired access tokens
+    * Returns new access & refresh tokens
+
+    ## Cookies
+    * **vaultexe_access_token**
+    * **vaultexe_refresh_token**
+    """
+    if not req_device_id:
+        raise AuthenticationException
+    return await grant_web_token(
+        rc=rc,
+        res=res,
+        user=user,
+        ip=req_ip,
+        is_refresh=True,
+        device_id=req_device_id,
+    )
+
+
 @router.post("/otp")
 async def otp_login(
     db: DbDep,
-    rc: AsyncRedisClientDep,
     ip: ReqIpDep,
-    user: OTPUserDep,
     res: Response,
+    user: OTPUserDep,
+    rc: AsyncRedisClientDep,
     otp: Annotated[str, Body(...)],
     req_device_id: DeviceIDCookieDep = None,
 ) -> Response:
@@ -238,6 +275,7 @@ async def grant_web_token(
     ip: IPvAnyAddress,
     device_id: str,
     res: Response,
+    is_refresh: bool = False,
 ) -> Response:
     """
     ## Generates & returns access & refresh tokens
@@ -245,11 +283,14 @@ async def grant_web_token(
     ## flow
     An access token and a refresh token will be generated and sent with the response.
     The refresh token claim will be stored in redis with a specified ttl.
-    (even if there was an previous active refresh token)
+    Even if there was a previous active refresh token
     The refresh token claim will contain the same jti as the access token claim.
     This will ensure that the currently used access token was generated along with the refresh token.
     Eventually when a user requests a new access token, a new refresh token will be generated as well.
     (aka: refresh token rotation)
+
+    Args:
+        is_refresh (bool, optional): If true, the refresh token will be cached but maintain its ttl.
     """
     at_claim, at, rt_claim, rt = tokens.create_web_tokens(
         ip=ip,
@@ -261,6 +302,7 @@ async def grant_web_token(
         rc,
         token_claim=rt_claim,
         key=str((str(user.id), device_id)),
+        keep_ttl=is_refresh,
     )
 
     res.status_code = status.HTTP_200_OK
@@ -268,7 +310,6 @@ async def grant_web_token(
     res.set_cookie(
         key=CookieKey.ACCESS_TOKEN,
         value=at,
-        httponly=True,
         secure=settings.is_prod,
         expires=at_claim.exp,
     )

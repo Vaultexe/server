@@ -35,9 +35,9 @@ class TokenBase(BaseSchema):
     ip_serilizer = field_serializer("ip")(to_str)
 
     @classmethod
-    def from_encoded(cls, token: str) -> Self:
+    def from_encoded(cls, token: str, *, allow_expired: bool = False) -> Self:
         """Create a token object from an encoded token string"""
-        claim = security.decode_token(token)
+        claim = security.decode_token(token, allow_expired=allow_expired)
         return cls.model_validate(claim)
 
 

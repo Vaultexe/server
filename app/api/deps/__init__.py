@@ -3,6 +3,7 @@ from .auth import (
     DeviceIDCookieDep,
     OAuth2PasswordRequestFormDep,
     OTPUserDep,
+    RefreshUserDep,
     ReqDeviceDep,
     ReqIpDep,
     ReqUserAgentDep,
