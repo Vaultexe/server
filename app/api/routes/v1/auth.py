@@ -10,6 +10,8 @@ from app import cache, models, schemas
 from app.api.deps import (
     AsyncRedisClientDep,
     DbDep,
+    DeviceIDCookieDep,
+    MQHigh,
     OAuth2PasswordRequestFormDep,
     OTPUserDep,
     RefreshUserDep,
@@ -17,8 +19,6 @@ from app.api.deps import (
     ReqUserAgentDep,
     ReqVerifiedDeviceDep,
 )
-from app.api.deps.auth import DeviceIDCookieDep
-from app.api.deps.cache import MQHigh
 from app.cache.client import AsyncRedisClient
 from app.cache.key_gen import KeyGen
 from app.core import security, tokens
@@ -291,7 +291,7 @@ async def grant_web_token(
     Args:
         is_refresh (bool, optional): If true, the refresh token will be cached but maintain its ttl.
     """
-    at_claim, at, rt_claim, rt = tokens.create_web_tokens(
+    _, at, rt_claim, rt = tokens.create_web_tokens(
         ip=ip,
         subject=user.id,
         is_admin=user.is_admin,
@@ -307,16 +307,18 @@ async def grant_web_token(
     res.status_code = status.HTTP_200_OK
 
     res.set_cookie(
-        key=CookieKey.ACCESS_TOKEN,
-        value=at,
-        secure=settings.is_prod,
-        expires=at_claim.exp,
-    )
-
-    res.set_cookie(
         key=CookieKey.REFRESH_TOKEN,
         value=rt,
         httponly=True,
+        secure=settings.is_prod,
+        expires=rt_claim.exp,
+    )
+
+    # keep access token for the same duration as the refresh token
+    # this is because expired access tokens are used along with the refresh tokenduring token rotation
+    res.set_cookie(
+        key=CookieKey.ACCESS_TOKEN,
+        value=at,
         secure=settings.is_prod,
         expires=rt_claim.exp,
     )
