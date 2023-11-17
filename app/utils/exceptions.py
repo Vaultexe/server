@@ -1,4 +1,11 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from fastapi import HTTPException, status
+
+if TYPE_CHECKING:
+    from app.models.base import BaseModel
 
 
 class TokenExpiredException(HTTPException):
@@ -74,12 +81,12 @@ class UnverifiedEmailException(HTTPException):
 
 
 class EntityNotFoundException(HTTPException):
-    def __init__(self, model: object | str) -> None:
-        entity = model.__class__.__name__ if isinstance(model, object) else model
+    def __init__(self, model: type[BaseModel] | str) -> None:
+        entity = model.__tablename__ if isinstance(model, BaseModel) else model
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=f"{entity} not found")
 
 
 class DuplicateEntityException(HTTPException):
-    def __init__(self, model: object | str) -> None:
-        entity = model.__class__.__name__ if isinstance(model, object) else model
+    def __init__(self, model: type[BaseModel] | str) -> None:
+        entity = model.__tablename__ if isinstance(model, BaseModel) else model
         super().__init__(status_code=status.HTTP_409_CONFLICT, detail=f"{entity} already exists")
