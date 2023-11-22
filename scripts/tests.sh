@@ -9,3 +9,5 @@ set -x
 coverage run --rcfile=pyproject.toml -m pytest ./tests/
 coverage combine
 coverage report --rcfile=pyproject.toml -m
+coverage html --rcfile=pyproject.toml
+coverage erase --rcfile=pyproject.toml
