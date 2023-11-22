@@ -1,5 +1,5 @@
 import datetime as dt
-from typing import AnyStr
+from typing import Any
 
 import pytest
 
@@ -16,7 +16,7 @@ from app.utils.helpers import to_str, to_timestamp
         (True, "True"),
     ],
 )
-def test_to_str(input: AnyStr, expected: str):
+def test_to_str(input: Any, expected: str):
     assert to_str(input) == expected
 
 
@@ -28,5 +28,5 @@ def test_to_str(input: AnyStr, expected: str):
         (dt.datetime(2022, 12, 31, 23, 59, 59), dt.datetime(2022, 12, 31, 23, 59, 59).timestamp()),
     ],
 )
-def test_to_timestamp(input: dt.datetime, expected: int):
+def test_to_timestamp(input: dt.datetime | None, expected: int | None):
     assert to_timestamp(input) == expected
