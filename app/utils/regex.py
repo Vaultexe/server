@@ -92,3 +92,8 @@ def is_valid_password(password: str) -> bool:
 def uuid4_str() -> str:
     """Generates a string uuid4"""
     return str(uuid.uuid4())
+
+
+def capitalize_first_letter(text: str) -> str:
+    """Capitalizes the first letter of a string"""
+    return text[0].upper() + text[1:] if text else text

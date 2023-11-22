@@ -4,6 +4,8 @@ from typing import TYPE_CHECKING
 
 from fastapi import HTTPException, status
 
+from app.utils.regex import capitalize_first_letter
+
 if TYPE_CHECKING:
     from app.models.base import BaseModel
 
@@ -82,11 +84,11 @@ class UnverifiedEmailException(HTTPException):
 
 class EntityNotFoundException(HTTPException):
     def __init__(self, model: type[BaseModel] | str) -> None:
-        entity = model.__tablename__ if isinstance(model, BaseModel) else model
+        entity = model if isinstance(model, str) else capitalize_first_letter(model.table_name())
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail=f"{entity} not found")
 
 
 class DuplicateEntityException(HTTPException):
     def __init__(self, model: type[BaseModel] | str) -> None:
-        entity = model.__tablename__ if isinstance(model, BaseModel) else model
+        entity = model if isinstance(model, str) else capitalize_first_letter(model.table_name())
         super().__init__(status_code=status.HTTP_409_CONFLICT, detail=f"{entity} already exists")
