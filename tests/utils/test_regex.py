@@ -1,6 +1,12 @@
 import pytest
 
-from app.utils.regex import camel_to_snake, generate_password, is_valid_password
+from app.utils.regex import (
+    camel_to_snake,
+    capitalize_first_letter,
+    generate_password,
+    is_valid_password,
+    uuid4_str,
+)
 
 
 @pytest.mark.parametrize(
@@ -36,6 +42,31 @@ def test_is_valid_password(input: str, expected: bool):
     assert is_valid_password(input) == expected
 
 
-@pytest.mark.parametrize("input, expected", [(generate_password(), True) for _ in range(100)])
-def test_generate_password(input: str, expected: bool):
-    assert is_valid_password(input) == expected
+def test_generate_password():
+    for _ in range(100):
+        input = generate_password()
+        assert is_valid_password(input)
+
+
+def test_generate_password_length_error():
+    with pytest.raises(ValueError):
+        generate_password(7)
+
+
+def test_uuid4_str():
+    assert isinstance(uuid4_str(), str)
+
+
+@pytest.mark.parametrize(
+    "input, expected",
+    [
+        ("", ""),
+        ("a", "A"),
+        ("hello", "Hello"),
+        ("world", "World"),
+        ("github copilot", "Github copilot"),
+        ("test", "Test"),
+    ],
+)
+def test_capitalize_first_letter(input: str, expected: str):
+    assert capitalize_first_letter(input) == expected
