@@ -82,7 +82,7 @@ async def setup_inviation(
     """Handle invitation tokens & invitation email"""
     invitation_token = uuid.uuid4()
 
-    expires_at = dt.datetime.utcnow() + dt.timedelta(hours=expires_in_hours)
+    expires_at = dt.datetime.now(dt.UTC) + dt.timedelta(hours=expires_in_hours)
 
     new_invitation = schemas.InvitationCreate(
         token=invitation_token,
