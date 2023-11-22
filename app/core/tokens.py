@@ -39,8 +39,8 @@ def create_web_tokens(
     at_exp = iat + dt.timedelta(seconds=at_ttl)
     rt_exp = iat + dt.timedelta(seconds=rt_ttl)
 
-    at_claim = AccessTokenClaim(jti=jti, sub=subject, is_admin=is_admin, iat=iat, exp=at_exp)
-    rt_claim = RefreshTokenClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=rt_exp)
+    at_claim = AccessTokenClaim(jti=jti, sub=subject, is_admin=is_admin, iat=iat, exp=at_exp)  # type: ignore
+    rt_claim = RefreshTokenClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=rt_exp)  # type: ignore
 
     at = security.encode_token(at_claim.model_dump())
     rt = security.encode_token(rt_claim.model_dump())
@@ -65,7 +65,7 @@ def create_otp_tokens(
     jti, iat = uuid.uuid4(), dt.datetime.now(dt.UTC)
     exp = iat + dt.timedelta(seconds=settings.OTP_EXPIRE_SECONDS)
 
-    otpt_claim = OTPTokenClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=exp)
+    otpt_claim = OTPTokenClaim(jti=jti, sub=subject, ip=ip, iat=iat, exp=exp)  # type: ignore
     otp_sh_claim = OTPSaltedHashClaim(
         ip=ip,
         jti=jti,
@@ -74,7 +74,7 @@ def create_otp_tokens(
         hash=hash,
         salt=salt,
         sub=subject,
-    )
+    )  # type: ignore
 
     otpt = security.encode_token(otpt_claim.model_dump())
 
