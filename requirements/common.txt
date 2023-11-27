@@ -7,7 +7,7 @@ email-validator==2.1.0.post1
 python-multipart==0.0.6
 async-timeout==4.0.3
 tenacity==8.2.3
-httpx==0.25.1
+httpx==0.25.2
 
 # Email
 sendgrid==6.10.0
