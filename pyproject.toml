@@ -47,6 +47,7 @@ ignore = [
     "B904", # raise exception from except block with no `from` keyword
     "B024", # abstract class without abstract methods
     "E501", # line too long (handled by ruff formatter)
+    "E711", # comparison to None shall be using `is` (sqlalchemy uses `==`)
 ]
 fixable = ["ALL"]
 
