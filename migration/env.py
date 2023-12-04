@@ -2,6 +2,7 @@ import asyncio
 from logging.config import fileConfig
 
 from alembic import context
+from alembic.migration import MigrationContext
 from alembic.operations.ops import MigrationScript
 from alembic.script import ScriptDirectory
 from sqlalchemy import engine_from_config, pool
@@ -39,7 +40,7 @@ target_metadata = base_model_metadata
 # ... etc.
 
 
-def process_revision_directives(context: context, _, directives: list[MigrationScript]):
+def process_revision_directives(context: MigrationContext, _, directives: list[MigrationScript]):
     """
     Custom revision directive to automatically generate revision id's sequentially.
     Reference: https://stackoverflow.com/a/67398484/19517403
@@ -47,7 +48,7 @@ def process_revision_directives(context: context, _, directives: list[MigrationS
     # extract Migration
     migration_script = directives[0]
     # extract current head revision
-    head_revision = ScriptDirectory.from_config(context.config).get_current_head()
+    head_revision = ScriptDirectory.from_config(context.config).get_current_head() # type: ignore
 
     if head_revision is None:
         # edge case with first migration
@@ -78,7 +79,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        process_revision_directives=process_revision_directives,
+        process_revision_directives=process_revision_directives, # type: ignore
     )
 
     with context.begin_transaction():
@@ -89,7 +90,7 @@ def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
-        process_revision_directives=process_revision_directives,
+        process_revision_directives=process_revision_directives, # type: ignore
     )
 
     with context.begin_transaction():
@@ -105,7 +106,7 @@ async def run_migrations_online() -> None:
     """
     connectable = AsyncEngine(
         engine_from_config(
-            config.get_section(config.config_ini_section),
+            config.get_section(config.config_ini_section), # type: ignore
             prefix="sqlalchemy.",
             poolclass=pool.NullPool,
             future=True,
