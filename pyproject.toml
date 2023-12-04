@@ -106,7 +106,7 @@ ignore-setters = false
 fail-under = 20
 exclude = [
     "tests/*",
-    "alembic/*",
+    "migration/*",
     "app/schemas/*"
 ]
 ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
