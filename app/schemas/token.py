@@ -7,7 +7,7 @@ from pydantic import Field, IPvAnyAddress, field_serializer
 from app.core import security
 from app.schemas import BaseSchema
 from app.schemas.enums import TokenType
-from app.utils.helpers import to_str, to_timestamp
+from app.utils.helpers import to_int_timestamp, to_str
 
 """
 JWT: JWT Token Schema
@@ -30,7 +30,7 @@ class TokenBase(BaseSchema):
     is_admin: bool | None = Field(None, exclude=True)
     ip: IPvAnyAddress | None = Field(None, exclude=True)
 
-    dates_serilizer = field_serializer("iat", "exp")(to_timestamp)
+    dates_serilizer = field_serializer("iat", "exp")(to_int_timestamp)
     ids_serilizer = field_serializer("jti", "sub")(to_str)
     ip_serilizer = field_serializer("ip")(to_str)
 

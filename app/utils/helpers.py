@@ -7,6 +7,6 @@ def to_str(value: Any) -> str | None:
     return str(value) if value is not None else None
 
 
-def to_timestamp(value: dt.datetime | None) -> int | None:
+def to_int_timestamp(value: dt.datetime | None) -> int | None:
     """Convert datetime to timestamp"""
     return int(value.timestamp()) if value is not None else None
