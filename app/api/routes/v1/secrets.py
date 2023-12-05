@@ -2,10 +2,14 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Body, Path
+from sqlalchemy.exc import IntegrityError
 
 from app import models, schemas
 from app.api.deps import DbDep, UserDep
+from app.api.deps.cache import AsyncRedisClientDep
 from app.db import repos as repo
+from app.events import notify
+from app.schemas.enums import Op
 from app.utils.exceptions import DuplicateEntityException, EntityNotFoundException
 
 router = APIRouter()
@@ -26,7 +30,16 @@ async def create_secret(
     db: DbDep,
     user: UserDep,
     new_cipher: Annotated[schemas.CipherCreate, Body(...)],
+    rc: AsyncRedisClientDep,
 ) -> schemas.Cipher:
+    """
+    ## Add new secret
+
+    ## Sync event
+    Syncs user vault by notifying all
+    connected devices via redis pubsub
+    with a create event
+    """
     try:
         cipher = await repo.cipher.create(
             db,
@@ -35,37 +48,65 @@ async def create_secret(
         )
         await db.commit()
         await db.refresh(cipher)
-        return schemas.Cipher.model_validate(cipher)
-    except Exception:
+    except IntegrityError:
         await db.rollback()
         raise DuplicateEntityException(models.Cipher)
+
+    cipher = schemas.Cipher.model_validate(cipher)
+    await notify(rc, user_id=user.id, data=cipher, action=Op.CREATE)
+    return cipher
 
 
 @router.put("/{cipher_id}")
 async def update_secret(
     db: DbDep,
-    _: UserDep,
+    user: UserDep,
+    rc: AsyncRedisClientDep,
     cipher_id: Annotated[uuid.UUID, Path(...)],
     cipher_update: Annotated[schemas.CipherUpdate, Body(...)],
 ) -> schemas.Cipher:
+    """
+    ## Update existing secret
+
+    ## Sync event
+    Syncs user vault by notifying all
+    connected devices via redis pubsub
+    with an update event
+    """
     cipher = await repo.cipher.get(db, id=cipher_id)
     if not cipher:
         raise EntityNotFoundException("Secret")
+
     cipher.import_from(cipher_update)
     await db.commit()
     await db.refresh(cipher)
-    return schemas.Cipher.model_validate(cipher)
+
+    secret = schemas.Cipher.model_validate(cipher)
+    await notify(rc, user_id=user.id, data=secret, action=Op.UPDATE)
+    return secret
 
 
 @router.delete("/{cipher_id}")
 async def delete_secret(
     db: DbDep,
-    _: UserDep,
+    user: UserDep,
+    rc: AsyncRedisClientDep,
     cipher_id: Annotated[uuid.UUID, Path(...)],
 ) -> schemas.Cipher:
+    """
+    ## Delete existing secret
+
+    ## Sync event
+    Syncs user vault by notifying all
+    connected devices via redis pubsub
+    with a soft delete event
+    """
     cipher = await repo.cipher.soft_delete(db, id=cipher_id)
     if not cipher:
         raise EntityNotFoundException("Secret")
     await db.commit()
     await db.refresh(cipher)
-    return schemas.Cipher.model_validate(cipher)
+
+    secret = schemas.Cipher.model_validate(cipher)
+    await notify(rc, user_id=user.id, data=secret, action=Op.SOFT_DELETE)
+    return secret
