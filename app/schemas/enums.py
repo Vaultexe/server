@@ -40,3 +40,10 @@ class CookieKey(BaseEnum):
     REFRESH_TOKEN = auto()
     OTP_TOKEN = auto()
     DEVICE_ID = auto()
+
+
+class Op(BaseEnum):
+    CREATE = auto()
+    UPDATE = auto()
+    DELETE = auto()
+    SOFT_DELETE = auto()

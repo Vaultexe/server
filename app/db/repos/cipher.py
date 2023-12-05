@@ -44,7 +44,7 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         self,
         db: AsyncSession,
         *,
-        collection_id: uuid.UUID,
+        id: uuid.UUID,
     ) -> list[uuid.UUID]:
         """
         Soft delete all ciphers ina  collection
@@ -52,7 +52,7 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         """
         query = (
             sa.update(self.model)
-            .where(self.model.collection_id == collection_id)
+            .where(self.model.collection_id == id)
             .values(
                 deleted_at=sa.func.now(),
                 collection_id=None,

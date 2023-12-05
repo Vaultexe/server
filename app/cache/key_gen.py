@@ -14,6 +14,8 @@ class KeyGen(Enum):
     OTP_SALTED_HASH = "otp_shash"  # nosec - this is not a secret (bandit)
     RESET_PASSWORD_TOKEN = "reset_pwd_token"  # nosec - this is not a secret (bandit)
 
+    USER_SYNC_VAULT_PUBSUB_CHANNEL = "sync_vault"  # nosec - this is not a secret (bandit)
+
     def __call__(
         self,
         key,
