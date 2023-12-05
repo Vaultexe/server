@@ -48,7 +48,7 @@ def process_revision_directives(context: MigrationContext, _, directives: list[M
     # extract Migration
     migration_script = directives[0]
     # extract current head revision
-    head_revision = ScriptDirectory.from_config(context.config).get_current_head() # type: ignore
+    head_revision = ScriptDirectory.from_config(context.config).get_current_head()  # type: ignore
 
     if head_revision is None:
         # edge case with first migration
@@ -79,7 +79,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
-        process_revision_directives=process_revision_directives, # type: ignore
+        process_revision_directives=process_revision_directives,  # type: ignore
     )
 
     with context.begin_transaction():
@@ -90,7 +90,7 @@ def do_run_migrations(connection: Connection) -> None:
     context.configure(
         connection=connection,
         target_metadata=target_metadata,
-        process_revision_directives=process_revision_directives, # type: ignore
+        process_revision_directives=process_revision_directives,  # type: ignore
     )
 
     with context.begin_transaction():
@@ -106,7 +106,7 @@ async def run_migrations_online() -> None:
     """
     connectable = AsyncEngine(
         engine_from_config(
-            config.get_section(config.config_ini_section), # type: ignore
+            config.get_section(config.config_ini_section),  # type: ignore
             prefix="sqlalchemy.",
             poolclass=pool.NullPool,
             future=True,
