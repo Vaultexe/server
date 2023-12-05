@@ -264,6 +264,8 @@ async def otp_login(
     await repo.device.verify(db, id=req_device_id)
     await db.commit()
 
+    res.delete_cookie(key=CookieKey.OTP_TOKEN)
+
     return await grant_web_token(rc=rc, user=user, ip=ip, device_id=req_device_id, res=res)
 
 
