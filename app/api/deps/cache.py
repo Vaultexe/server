@@ -8,9 +8,10 @@ from app.cache.client import AsyncRedisClient
 from app.core.config import settings
 from app.schemas.enums import WorkerQueue
 
+sync_redis_pool = redis.ConnectionPool.from_url(str(settings.REDIS_URI))
 
 def get_sync_redis_conn() -> redis.Redis:
-    return redis.Redis.from_url(str(settings.REDIS_URI))
+    return redis.Redis(connection_pool=sync_redis_pool)
 
 
 def get_mq_low() -> rq.Queue:
