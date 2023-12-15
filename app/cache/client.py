@@ -80,7 +80,7 @@ class AsyncRedisClient:
             for key, value in key_value_pairs.items():
                 value = self.encode(value)
                 pipe.set(key, value, ex=ttl)
-            return await pipe.execute()
+            return bool(await pipe.execute())
 
     async def get(self, key: str) -> Any | None:
         """
