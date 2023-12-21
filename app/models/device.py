@@ -24,7 +24,7 @@ class Device(BaseModel):
     user_id: Mapped[uuid.UUID] = mapped_column(pg.UUID(as_uuid=True), ForeignKey("user.id"), index=True, nullable=False)
     is_verified: Mapped[bool] = mapped_column(nullable=False, default=False)
     user_agent: Mapped[str] = mapped_column(String(length=350), nullable=False)
-    regestered_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    registered_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
     last_login_ip: Mapped[str] = mapped_column(String(length=45), nullable=False)
     last_login_at: Mapped[dt.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     # fmt: on
