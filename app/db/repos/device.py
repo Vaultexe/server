@@ -1,3 +1,4 @@
+import datetime as dt
 import uuid
 
 import sqlalchemy as sa
@@ -5,11 +6,30 @@ from pydantic import IPvAnyAddress
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models, schemas
+from app.core.config import settings
 from app.db.repos.base import BaseRepo
 
 
 class DeviceRepo(BaseRepo[models.Device, schemas.DeviceCreate]):
     """Device repo"""
+
+    async def get_logged_in_devices(
+        self,
+        db: AsyncSession,
+        *,
+        user_id: uuid.UUID,
+    ) -> list[models.Device]:
+        """Get logged in devices ids"""
+        logged_in_after = dt.datetime.now(dt.UTC) - dt.timedelta(seconds=settings.REFRESH_TOKEN_EXPIRE_SECONDS)
+        query = sa.select(models.Device).where(
+            sa.and_(
+                models.Device.user_id == user_id,
+                models.Device.is_verified == True,
+                models.Device.last_login_at >= logged_in_after,
+            )
+        )
+        result = await db.scalars(query)
+        return result.all() # type: ignore
 
     async def verify(
         self,

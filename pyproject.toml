@@ -48,6 +48,7 @@ ignore = [
     "B024", # abstract class without abstract methods
     "E501", # line too long (handled by ruff formatter)
     "E711", # comparison to None shall be using `is` (sqlalchemy uses `==`)
+    "E712", # comparison to True should be `if cond is True:` or `if cond:` (sqlalchemy uses `==`)
 ]
 fixable = ["ALL"]
 

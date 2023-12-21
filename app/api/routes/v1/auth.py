@@ -18,6 +18,7 @@ from app.api.deps import (
     ReqIpDep,
     ReqUserAgentDep,
     ReqVerifiedDeviceDep,
+    UserDep,
 )
 from app.cache.client import AsyncRedisClient
 from app.cache.key_gen import KeyGen
@@ -267,6 +268,64 @@ async def otp_login(
     res.delete_cookie(key=CookieKey.OTP_TOKEN)
 
     return await grant_web_token(rc=rc, user=user, ip=ip, device_id=req_device_id, res=res)
+
+
+@router.post("/logout")
+async def logout(
+    res: Response,
+    user: UserDep,
+    rc: AsyncRedisClientDep,
+    req_device_id: DeviceIDCookieDep = None,
+) -> Response:
+    """
+    ## Logout
+
+    ## Overview
+    * Deletes refresh token claim from redis
+    * Deletes access & refresh token cookies
+    """
+    await cache.repo.delete_token(
+        rc,
+        key=str((str(user.id), req_device_id)),
+        key_gen=KeyGen.REFRESH_TOKEN
+    )
+
+    res.delete_cookie(key=CookieKey.ACCESS_TOKEN)
+    res.delete_cookie(key=CookieKey.REFRESH_TOKEN)
+
+    res.status_code = status.HTTP_200_OK
+    return res
+
+
+@router.post("/logout/all")
+async def logout_all(
+    res: Response,
+    db: DbDep,
+    user: UserDep,
+    rc: AsyncRedisClientDep,
+) -> list[schemas.Device]:
+    """
+    ## Logout from all devices
+
+    ## Overview
+    * Deletes all refresh token claims from redis
+    * Deletes access & refresh token cookies in requesting device
+    """
+    devices = await repo.device.get_logged_in_devices(db, user_id=user.id)
+    keys = [str((str(user.id), device.id)) for device in devices]
+
+    await cache.repo.delete_many_tokens(
+        rc,
+        keys=keys,
+        key_gen=KeyGen.REFRESH_TOKEN,
+        is_hashed_key=True,
+    )
+
+    res.delete_cookie(key=CookieKey.ACCESS_TOKEN)
+    res.delete_cookie(key=CookieKey.REFRESH_TOKEN)
+
+    res.status_code = status.HTTP_200_OK
+    return [schemas.Device.model_validate(device) for device in devices]
 
 
 async def grant_web_token(

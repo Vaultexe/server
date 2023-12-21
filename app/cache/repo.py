@@ -65,7 +65,19 @@ class CacheRepo:
     ) -> bool:
         """Delete token claim from redis"""
         key = key_gen(key, hash_key=is_hashed_key)
-        return await rc.delete(key)
+        return bool(await rc.delete(key))
+
+    async def delete_many_tokens(
+        self,
+        rc: AsyncRedisClient,
+        *,
+        keys: list[str],
+        key_gen: KeyGen,
+        is_hashed_key: bool = False,
+    ) -> int:
+        """Delete many tokens from redis"""
+        keys = [key_gen(key, hash_key=is_hashed_key) for key in keys]
+        return await rc.delete_many(keys)
 
     def _get_token_type_ttl(self, token_cls: type[TokenBase]) -> int:
         ttl = {
