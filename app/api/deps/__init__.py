@@ -10,5 +10,5 @@ from .auth import (
     ReqVerifiedDeviceDep,
     UserDep,
 )
-from .cache import AsyncRedisClientDep, MQDefault, MQHigh, MQLow, SyncRedisClientDep
+from .cache import AsyncRedisClientDep, MQDefault, MQHigh, MQLow
 from .db import DbDep

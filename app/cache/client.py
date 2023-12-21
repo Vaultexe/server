@@ -122,14 +122,14 @@ class AsyncRedisClient:
         values = [self.decode(value) for value in values]
         return dict(zip(keys, values, strict=True))
 
-    async def delete(self, key: str) -> bool:
+    async def delete(self, key: str) -> int:
         """
         Delete a key from Redis.
 
         Returns:
             True if successful, False otherwise.
         """
-        return await self.redis.delete(key) == 1
+        return await self.redis.unlink(key)
 
     async def delete_many(self, keys: list[str]) -> int:
         """
@@ -138,7 +138,7 @@ class AsyncRedisClient:
         Returns:
             Number of keys deleted.
         """
-        return await self.redis.delete(*keys)
+        return await self.redis.unlink(*keys)
 
     async def delete_all_startswith(self, key_prefix: str) -> int:
         """
