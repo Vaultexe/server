@@ -3,16 +3,15 @@ from app.core.config import settings
 from app.schemas import OTPSaltedHashClaim, RefreshTokenClaim, TokenBase
 
 
-class CacheRepo:
-    """Cache repo"""
-
-    async def save_token_claim(
+class TokensService:
+    async def save(
         self,
         rc: AsyncRedisClient,
         *,
         key: str,
         token_claim: TokenBase,
         keep_ttl: bool = False,
+        ttl: int | None = None,
     ) -> bool:
         """
         Cache token claim.
@@ -22,26 +21,25 @@ class CacheRepo:
         If the keep_ttl is set to True, the ttl is not changed when the token is updated.
         However if the token is not found in the cache, the ttl is set to the token's ttl.
 
-        If the hash_key is set to True, the key will be md5 hashed before being cached.
-
         Returns:
-            bool: True if successful, False otherwise.
+            int: ttl of the token.
         """
+        value = token_claim.model_dump_json()
+
         if keep_ttl:
-            exists = await rc.redis.set(
+            exists = await rc.set(
                 key,
-                token_claim.model_dump_json(),
+                value,
                 xx=True,
                 keepttl=True,
             )
             if exists:
                 return True
 
-        ttl = self._get_token_type_ttl(type(token_claim))
+        ttl = ttl or self._get_token_type_ttl(type(token_claim))
+        return await rc.set(key, value, ex=ttl)
 
-        return await rc.set(key, token_claim, ttl=ttl)
-
-    async def get_token[T: TokenBase](
+    async def get[T: TokenBase](
         self,
         rc: AsyncRedisClient,
         *,
@@ -50,25 +48,7 @@ class CacheRepo:
     ) -> T | None:
         """Get token claim"""
         token = await rc.get(key)
-        return token_cls.model_validate(token) if token else None
-
-    async def delete_token(
-        self,
-        rc: AsyncRedisClient,
-        *,
-        key: str,
-    ) -> bool:
-        """Delete token claim from redis"""
-        return bool(await rc.delete(key))
-
-    async def delete_many_tokens(
-        self,
-        rc: AsyncRedisClient,
-        *,
-        keys: list[str],
-    ) -> int:
-        """Delete many tokens from redis"""
-        return await rc.delete_many(keys)
+        return token_cls.model_validate_json(token) if token else None
 
     def _get_token_type_ttl(self, token_cls: type[TokenBase]) -> int:
         ttl = {
@@ -83,4 +63,4 @@ class CacheRepo:
         return ttl
 
 
-repo = CacheRepo()
+tokens = TokensService()

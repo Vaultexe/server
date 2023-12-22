@@ -17,7 +17,7 @@ async def notify(
     """Notify user vault changes"""
     type = "collection" if isinstance(data, Collection) else "cipher"
     sync_data = SyncData(action=action, data=data, type=type)
-    await rc.redis.publish(
+    await rc.publish(
         cache.keys.sync_vault_pubsub(user_id),
         sync_data.model_dump_json(),
     )
