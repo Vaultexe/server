@@ -12,7 +12,7 @@ class TokensService:
         token_claim: TokenBase,
         keep_ttl: bool = False,
         ttl: int | None = None,
-    ) -> int:
+    ) -> bool:
         """
         Cache token claim.
 
