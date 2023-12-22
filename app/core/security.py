@@ -106,3 +106,8 @@ def verify_pwd(pwd: str, hash: str) -> bool:
         return False
     else:
         return True
+
+
+def md5(data: str) -> str:
+    """Get a md5 hash of a string"""
+    return hashlib.md5(data.encode(), usedforsecurity=False).hexdigest()

@@ -21,7 +21,6 @@ from app.api.deps import (
     UserDep,
 )
 from app.cache.client import AsyncRedisClient
-from app.cache.key_gen import KeyGen
 from app.core import security, tokens
 from app.core.config import settings
 from app.db import repos as repo
@@ -245,7 +244,7 @@ async def otp_login(
 
     otp_sh_claim = await cache.repo.get_token(
         rc,
-        key=str(user.id),
+        key=cache.keys.otp_shash_token(user.id),
         token_cls=schemas.OTPSaltedHashClaim,
     )
 
@@ -260,7 +259,7 @@ async def otp_login(
     if otp_sh_claim.ip != ip:
         raise AuthenticationException
 
-    await cache.repo.delete_token(rc, key=str(user.id), key_gen=KeyGen.OTP_SALTED_HASH)
+    await cache.repo.delete_token(rc, key=cache.keys.otp_shash_token(user.id))
 
     await repo.device.verify(db, id=req_device_id)
     await db.commit()
@@ -284,11 +283,8 @@ async def logout(
     * Deletes refresh token claim from redis
     * Deletes access & refresh token cookies
     """
-    await cache.repo.delete_token(
-        rc,
-        key=str((str(user.id), req_device_id)),
-        key_gen=KeyGen.REFRESH_TOKEN
-    )
+    key = cache.keys.refresh_token(user.id, req_device_id)
+    await cache.repo.delete_token(rc, key=key)
 
     res.delete_cookie(key=CookieKey.ACCESS_TOKEN)
     res.delete_cookie(key=CookieKey.REFRESH_TOKEN)
@@ -312,14 +308,9 @@ async def logout_all(
     * Deletes access & refresh token cookies in requesting device
     """
     devices = await repo.device.get_logged_in_devices(db, user_id=user.id)
-    keys = [str((str(user.id), device.id)) for device in devices]
+    keys = [cache.keys.refresh_token(user.id, device.id) for device in devices]
 
-    await cache.repo.delete_many_tokens(
-        rc,
-        keys=keys,
-        key_gen=KeyGen.REFRESH_TOKEN,
-        is_hashed_key=True,
-    )
+    await cache.repo.delete_many_tokens(rc, keys=keys)
 
     res.delete_cookie(key=CookieKey.ACCESS_TOKEN)
     res.delete_cookie(key=CookieKey.REFRESH_TOKEN)
@@ -360,9 +351,9 @@ async def grant_web_token(
 
     await cache.repo.save_token_claim(
         rc,
-        token_claim=rt_claim,
-        key=str((str(user.id), device_id)),
         keep_ttl=is_refresh,
+        token_claim=rt_claim,
+        key=cache.keys.refresh_token(user.id, device_id),
     )
 
     res.status_code = status.HTTP_200_OK
@@ -416,7 +407,11 @@ async def grant_autherization_code(
         subject=user.id,
     )
 
-    await cache.repo.save_token_claim(rc, key=str(user.id), token_claim=otp_sh_claim)
+    await cache.repo.save_token_claim(
+        rc,
+        key=cache.keys.otp_shash_token(user.id),
+        token_claim=otp_sh_claim,
+    )
 
     email_payload = schemas.OTPEmailPayload(
         otp=otp,
