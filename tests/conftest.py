@@ -1,4 +1,4 @@
-from app import cache, core, db, models, schemas, entrypoint, main, utils # noqa
+from app import cache, core, db, models, schemas, entrypoint, main, utils  # noqa
 
 import datetime as dt
 import re
@@ -52,4 +52,4 @@ def is_md5() -> Callable[[str], bool]:
 
 @pytest.fixture
 def local_ip() -> IPvAnyAddress:
-    return IPvAnyAddress("127.0.0.1")
+    return IPvAnyAddress("127.0.0.1")  # type: ignore

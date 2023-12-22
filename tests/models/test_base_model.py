@@ -14,7 +14,7 @@ class TestSchema(BaseSchema):
     data: str
     model_config = pydantic.ConfigDict(extra="allow")
 
-    __test__ = False # Prevent pytest from trying to collect this class as a test
+    __test__ = False  # Prevent pytest from trying to collect this class as a test
 
 
 class TestModel(BaseModel):
@@ -23,7 +23,7 @@ class TestModel(BaseModel):
     name: Mapped[str] = mapped_column(String)
     data: Mapped[str] = mapped_column(String)
 
-    __test__ = False # Prevent pytest from trying to collect this class as a test
+    __test__ = False  # Prevent pytest from trying to collect this class as a test
 
 
 @pytest.fixture
@@ -47,6 +47,7 @@ def test_import_from(mock_schema: TestSchema):
     model.import_from(mock_schema)
     for attr, value in mock_schema.model_dump().items():
         assert getattr(model, attr) == value
+
 
 def test_import_from_attr_error(mock_schema: TestSchema):
     # Add an extra unknown attribute to the schema

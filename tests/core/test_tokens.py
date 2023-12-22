@@ -13,7 +13,7 @@ class DataDict(TypedDict):
     subject: uuid.UUID
     ip: IPvAnyAddress
     is_admin: bool
-    otp : str
+    otp: str
 
 
 @pytest.fixture

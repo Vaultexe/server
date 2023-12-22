@@ -21,11 +21,13 @@ def test_token_expired_exception():
     assert e.value.status_code == 401
     assert e.value.detail == "Token has expired"
 
+
 def test_authentication_exception():
     with pytest.raises(HTTPException) as e:
         raise AuthenticationException()
     assert e.value.status_code == 401
     assert e.value.detail == "Authentication failed"
+
 
 def test_authorization_exception():
     with pytest.raises(HTTPException) as e:
@@ -33,11 +35,13 @@ def test_authorization_exception():
     assert e.value.status_code == 403
     assert e.value.detail == "Authorization failed"
 
+
 def test_invalid_otp_exception():
     with pytest.raises(HTTPException) as e:
         raise InvalidOTPException()
     assert e.value.status_code == 401
     assert e.value.detail == "Invalid OTP"
+
 
 def test_user_already_active_exception():
     with pytest.raises(HTTPException) as e:
@@ -45,17 +49,20 @@ def test_user_already_active_exception():
     assert e.value.status_code == 409
     assert e.value.detail == "User already active"
 
+
 def test_user_not_found_exception():
     with pytest.raises(HTTPException) as e:
         raise UserNotFoundException()
     assert e.value.status_code == 404
     assert e.value.detail == "User not found"
 
+
 def test_unverified_email_exception():
     with pytest.raises(HTTPException) as e:
         raise UnverifiedEmailException()
     assert e.value.status_code == 403
     assert e.value.detail == "Email not verified"
+
 
 def test_entity_not_found_exception():
     with pytest.raises(HTTPException) as e:
@@ -67,6 +74,7 @@ def test_entity_not_found_exception():
         raise EntityNotFoundException(User)
     assert e.value.status_code == 404
     assert e.value.detail == "User not found"
+
 
 def test_duplicate_entity_exception():
     with pytest.raises(HTTPException) as e:

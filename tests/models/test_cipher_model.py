@@ -7,16 +7,13 @@ from app.schemas.enums import CipherType
 
 
 def test_cipher_import_from() -> None:
-    obj = CipherCreate(
-        type=CipherType.LOGIN,
-        data=b"test",
-        collection_id=uuid.uuid4()
-    )
+    obj = CipherCreate(type=CipherType.LOGIN, data=b"test", collection_id=uuid.uuid4())
     cipher = Cipher()
     cipher.import_from(obj)
     assert cipher.type == obj.type
     assert cipher.data == obj.data
     assert cipher.collection_id == obj.collection_id
+
 
 def test_cipher_import_from_exclude_unset() -> None:
     obj = CipherCreate(

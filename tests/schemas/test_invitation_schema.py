@@ -16,9 +16,11 @@ def invitation():
         expires_at=dt.datetime.now(),
     )
 
-def test_invitation_create_token_hash(invitation:InvitationCreate):
+
+def test_invitation_create_token_hash(invitation: InvitationCreate):
     assert invitation.token_hash is not None
 
-def test_invitation_create_dumps(invitation:InvitationCreate):
+
+def test_invitation_create_dumps(invitation: InvitationCreate):
     dump = invitation.model_dump()
     assert "token" not in dump

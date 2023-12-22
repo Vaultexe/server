@@ -33,7 +33,9 @@ def test_invitation_is_expired():
         created_by=uuid.uuid4(),
         expires_at=dt.datetime.now(dt.UTC) + dt.timedelta(days=1),
     )
-    expired_obj = obj.model_copy(update={"expires_at": dt.datetime.now(dt.UTC) - dt.timedelta(days=1)})
+    expired_obj = obj.model_copy(
+        update={"expires_at": dt.datetime.now(dt.UTC) - dt.timedelta(days=1)}
+    )
 
     # Act
     invitation = Invitation.create_from(obj)
@@ -42,4 +44,3 @@ def test_invitation_is_expired():
     # Assert
     assert invitation.is_expired is False
     assert expired_invitation.is_expired is True
-

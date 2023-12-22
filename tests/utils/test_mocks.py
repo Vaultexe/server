@@ -13,4 +13,3 @@ def test_mock_worker_job():
     assert isinstance(worker_job, schemas.WorkerJob)
     for key, value in kwargs.items():
         assert getattr(worker_job, key) == value
-
