@@ -242,7 +242,7 @@ async def otp_login(
     if not req_device_id:
         raise AuthenticationException
 
-    otp_sh_claim = await cache.repo.get_token(
+    otp_sh_claim = await cache.tokens.get(
         rc,
         key=cache.keys.otp_shash_token(user.id),
         token_cls=schemas.OTPSaltedHashClaim,
@@ -259,7 +259,7 @@ async def otp_login(
     if otp_sh_claim.ip != ip:
         raise AuthenticationException
 
-    await cache.repo.delete_token(rc, key=cache.keys.otp_shash_token(user.id))
+    await rc.unlink(cache.keys.otp_shash_token(user.id))
 
     await repo.device.verify(db, id=req_device_id)
     await db.commit()
@@ -284,7 +284,7 @@ async def logout(
     * Deletes access & refresh token cookies
     """
     key = cache.keys.refresh_token(user.id, req_device_id)
-    await cache.repo.delete_token(rc, key=key)
+    await rc.unlink(key)
 
     res.delete_cookie(key=CookieKey.ACCESS_TOKEN)
     res.delete_cookie(key=CookieKey.REFRESH_TOKEN)
@@ -310,7 +310,7 @@ async def logout_all(
     devices = await repo.device.get_logged_in_devices(db, user_id=user.id)
     keys = [cache.keys.refresh_token(user.id, device.id) for device in devices]
 
-    await cache.repo.delete_many_tokens(rc, keys=keys)
+    await rc.unlink(*keys)
 
     res.delete_cookie(key=CookieKey.ACCESS_TOKEN)
     res.delete_cookie(key=CookieKey.REFRESH_TOKEN)
@@ -349,7 +349,7 @@ async def grant_web_token(
         is_admin=user.is_admin,
     )
 
-    await cache.repo.save_token_claim(
+    await cache.tokens.save(
         rc,
         keep_ttl=is_refresh,
         token_claim=rt_claim,
@@ -407,7 +407,7 @@ async def grant_autherization_code(
         subject=user.id,
     )
 
-    await cache.repo.save_token_claim(
+    await cache.tokens.save(
         rc,
         key=cache.keys.otp_shash_token(user.id),
         token_claim=otp_sh_claim,

@@ -53,7 +53,7 @@ async def init_redis_connection() -> None:
     try:
         async with timeout(TIMEOUT):
             redis = AsyncRedisClient()
-            await redis.redis.ping()
+            await redis.ping()
     except Exception as e:
         logger.error("--- Connection to Redis failed ---")
         logger.log(logging.ERROR, e)
