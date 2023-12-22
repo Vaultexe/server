@@ -20,7 +20,9 @@ class DeviceRepo(BaseRepo[models.Device, schemas.DeviceCreate]):
         user_id: uuid.UUID,
     ) -> list[models.Device]:
         """Get logged in devices ids"""
-        logged_in_after = dt.datetime.now(dt.UTC) - dt.timedelta(seconds=settings.REFRESH_TOKEN_EXPIRE_SECONDS)
+        logged_in_after = dt.datetime.now(dt.UTC) - dt.timedelta(
+            seconds=settings.REFRESH_TOKEN_EXPIRE_SECONDS
+        )
         query = sa.select(models.Device).where(
             sa.and_(
                 models.Device.user_id == user_id,
@@ -29,7 +31,7 @@ class DeviceRepo(BaseRepo[models.Device, schemas.DeviceCreate]):
             )
         )
         result = await db.scalars(query)
-        return result.all() # type: ignore
+        return result.all()  # type: ignore
 
     async def verify(
         self,

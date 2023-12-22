@@ -19,7 +19,7 @@ from app.utils.exceptions import (
 def get_ip(req: Request) -> IPvAnyAddress:
     """Returns the IP address of the client making the request"""
     if ip := req.headers.get("X-Forwarded-For"):
-        return IPvAnyAddress(ip.split(",", 1)[0])
+        return IPvAnyAddress(ip.split(",", 1)[0])  # type: ignore
     return IPvAnyAddress(req.client.host)  # type: ignore
 
 
@@ -92,9 +92,10 @@ async def get_current_user(
 
     at_claim = AccessTokenClaim.from_encoded(token)
 
+    rt_key = cache.keys.refresh_token(at_claim.sub, req_device_id)
     rt_claim = await cache.repo.get_token(
         rc=rc,
-        key=str((at_claim.sub, req_device_id)),
+        key=rt_key,
         token_cls=RefreshTokenClaim,
     )
 
@@ -156,9 +157,10 @@ async def get_refresh_user(
     ):  # fmt: off
         raise AuthenticationException
 
+    validator_rt_key = cache.keys.refresh_token(rt_claim.sub, req_device_id)
     validator_rt = await cache.repo.get_token(
         rc=rc,
-        key=str((rt_claim.sub, req_device_id)),
+        key=validator_rt_key,
         token_cls=RefreshTokenClaim,
     )
 

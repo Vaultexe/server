@@ -36,4 +36,3 @@ def test_import_from(local_ip) -> None:
     assert device.last_login_ip == str(local_ip)
     assert isinstance(device.last_login_at, dt.datetime)
     assert getattr(device, "ip", None) is None
-

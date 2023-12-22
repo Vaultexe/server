@@ -27,6 +27,7 @@ def test_json_encoder():
     encoded_random = encoder.default(random_obj)
     assert encoded_random == random_obj
 
+
 def test_object_hook():
     datetime_obj = dt.datetime.now()
     date_obj = dt.date.today()
@@ -52,7 +53,7 @@ def test_object_hook_type_error():
 def test_json_coder():
     datetime_obj = dt.datetime.now()
     date_obj = dt.date.today()
-    json_response = JSONResponse({"key":"value"})
+    json_response = JSONResponse({"key": "value"})
 
     # Test encoding and decoding datetime object
     encoded_datetime = JsonCoder.encode(datetime_obj)

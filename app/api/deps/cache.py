@@ -10,6 +10,7 @@ from app.schemas.enums import WorkerQueue
 
 mq_sync_redis_pool = redis.ConnectionPool.from_url(str(settings.REDIS_URI))
 
+
 def get_sync_redis_conn() -> redis.Redis:
     return redis.Redis(connection_pool=mq_sync_redis_pool)
 

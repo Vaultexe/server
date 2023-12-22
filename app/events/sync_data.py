@@ -8,6 +8,7 @@ class SyncData(BaseSchema):
     """
     Sync data schema
     """
+
     data: Collection | Cipher
     type: Literal["collection", "cipher"]
     action: Op
