@@ -93,8 +93,8 @@ async def get_current_user(
     at_claim = AccessTokenClaim.from_encoded(token)
 
     rt_key = cache.keys.refresh_token(at_claim.sub, req_device_id)
-    rt_claim = await cache.repo.get_token(
-        rc=rc,
+    rt_claim = await cache.tokens.get(
+        rc,
         key=rt_key,
         token_cls=RefreshTokenClaim,
     )
@@ -158,8 +158,8 @@ async def get_refresh_user(
         raise AuthenticationException
 
     validator_rt_key = cache.keys.refresh_token(rt_claim.sub, req_device_id)
-    validator_rt = await cache.repo.get_token(
-        rc=rc,
+    validator_rt = await cache.tokens.get(
+        rc,
         key=validator_rt_key,
         token_cls=RefreshTokenClaim,
     )

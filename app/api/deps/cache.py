@@ -12,7 +12,7 @@ mq_sync_redis_pool = redis.ConnectionPool.from_url(str(settings.REDIS_URI))
 
 
 def get_sync_redis_conn() -> redis.Redis:
-    return redis.Redis(connection_pool=mq_sync_redis_pool)
+    return redis.Redis(connection_pool=mq_sync_redis_pool, decode_responses=True)
 
 
 def get_mq_low() -> rq.Queue:

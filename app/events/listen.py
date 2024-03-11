@@ -15,7 +15,7 @@ async def listen(
     user_id: uuid.UUID,
 ) -> AsyncIterator:
     """Listen for user vault changes"""
-    async with rc.redis.pubsub(**__pubsub_settings__) as pubsub:
+    async with rc.pubsub(**__pubsub_settings__) as pubsub:
         await pubsub.subscribe(cache.keys.sync_vault_pubsub(user_id))
         async for message in pubsub.listen():
             if message["type"] == "message":
