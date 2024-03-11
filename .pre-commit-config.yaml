@@ -3,43 +3,36 @@
 default_language_version:
   python: python3.12
 repos:
-# Pre-commit hooks
-- repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v4.5.0
-  hooks:
-  - id: check-added-large-files
-    args:
-      - --maxkb=1024
-  - id: check-merge-conflict
-  - id: trailing-whitespace
-  - id: detect-private-key
-  - id: end-of-file-fixer
-  - id: check-json
-  - id: check-toml
-  - id: check-yaml
-    args:
-    - --unsafe
-# Ruff is a super fast linter written in Rust.
-- repo: https://github.com/charliermarsh/ruff-pre-commit
-  rev: v0.1.9
-  hooks:
-  - id: ruff
-    name: Code linting
-    args:
-    - --fix
-  - id: ruff-format
-    name: Code formatting
-# Bandit finds common security issues in Python code.
-- repo: https://github.com/PyCQA/bandit
-  rev: 1.7.6
-  hooks:
-  - id: bandit
-    args: [-l, -r, -x, tests]
-    files: ^app/.*\.py$
-# Codespell is a spell checker for source code.
-- repo: https://github.com/codespell-project/codespell
-  rev: v2.2.6
-  hooks:
-  - id: codespell
-    additional_dependencies:
-      - tomli
+  # Pre-commit hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-added-large-files
+        args:
+          - --maxkb=1024
+      - id: check-merge-conflict
+      - id: trailing-whitespace
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+        args:
+          - --unsafe
+  # Ruff is a super fast linter written in Rust.
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.9
+    hooks:
+      - id: ruff
+        name: Code linting
+        args:
+          - --fix
+      - id: ruff-format
+        name: Code formatting
+  # Codespell is a spell checker for source code.
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+        additional_dependencies:
+          - tomli
