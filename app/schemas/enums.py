@@ -1,6 +1,8 @@
 from enum import StrEnum, auto
 from typing import override
 
+from app.core.config import settings
+
 
 class BaseEnum(StrEnum):
     """
@@ -34,7 +36,7 @@ class CookieKey(BaseEnum):
         Uses the name as the automatic value, rather than an integer
         See https://docs.python.org/3/library/enum.html#using-automatic-values for reference
         """
-        return f"vaultexe_{name.lower()}"
+        return f"{settings.PROJECT_NAME}_{name.lower()}".lower()
 
     ACCESS_TOKEN = auto()
     REFRESH_TOKEN = auto()
