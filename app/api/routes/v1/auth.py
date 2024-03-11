@@ -256,7 +256,7 @@ async def otp_login(
     if not is_valid_otp:
         raise InvalidOTPException
 
-    if otp_sh_claim.ip != ip:
+    if str(otp_sh_claim.ip) != str(ip):
         raise AuthenticationException
 
     await rc.unlink(cache.keys.otp_shash_token(user.id))
