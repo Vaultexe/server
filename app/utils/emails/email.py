@@ -56,7 +56,7 @@ def send_registration_email(data: RegistrationEmailPayload) -> EmailResponse:
         body=body,
         ccs=data.ccs,
         environments={
-            "__registration_link__": f"{settings.DOMAIN}/register?token={data.token}",
+            "__registration_link__": f"{settings.DOMAIN}/register?token={data.token}&email={data.to}",
             "__email__": str(data.to),
             "__expires_in__": str(data.expires_in_hours),
         },
