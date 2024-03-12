@@ -1,6 +1,6 @@
 -r common.txt
 
-pre-commit==3.6.0
+pre-commit==3.6.2
 mypy==1.8.0
 ruff==0.1.9
 bandit==1.7.6
