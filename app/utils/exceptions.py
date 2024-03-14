@@ -92,3 +92,12 @@ class DuplicateEntityException(HTTPException):
     def __init__(self, model: type[BaseModel] | str) -> None:
         entity = model if isinstance(model, str) else capitalize_first_letter(model.table_name())
         super().__init__(status_code=status.HTTP_409_CONFLICT, detail=f"{entity} already exists")
+
+
+class InvalidFileTypeException(HTTPException):
+    def __init__(self, type: str | None = None) -> None:
+        expected_statement = f"Expected {type} file" if type else ""
+        super().__init__(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid file type\n{expected_statement}",
+        )
