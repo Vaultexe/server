@@ -32,6 +32,17 @@ class InvitationRepo:
         db.add(db_obj)
         return db_obj
 
+    async def bulk_create(
+        self,
+        db: AsyncSession,
+        *,
+        objs_in: list[schemas.InvitationCreate],
+    ) -> list[models.Invitation]:
+        """Create bulk invitations"""
+        db_objs = [models.Invitation.create_from(obj) for obj in objs_in]
+        db.add_all(db_objs)
+        return db_objs
+
     async def invalidate_tokens(
         self,
         db: AsyncSession,
@@ -50,7 +61,28 @@ class InvitationRepo:
             .where(models.Invitation.is_valid)
             .values(is_valid=False)
         )
-        res: sa.ResultProxy = await db.execute(query)  # type: ignore
+        res: sa.ResultProxy = await db.execute(query)
+        return res.rowcount
+
+    async def invalidate_bulk_tokens(
+        self,
+        db: AsyncSession,
+        *,
+        user_ids: list[uuid.UUID],
+    ) -> int:
+        """
+        Invalidate all user invitation tokens.
+
+        Returns:
+            Number of invalidated invitations
+        """
+        query = (
+            sa.update(models.Invitation)
+            .where(models.Invitation.invitee_id.in_(user_ids))
+            .where(models.Invitation.is_valid)
+            .values(is_valid=False)
+        )
+        res: sa.ResultProxy = await db.execute(query)
         return res.rowcount
 
 

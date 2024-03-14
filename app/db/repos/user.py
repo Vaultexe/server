@@ -1,4 +1,7 @@
+from typing import override
+
 import sqlalchemy as sa
+import sqlalchemy.dialects.postgresql as pg
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app import models, schemas
@@ -17,6 +20,23 @@ class UserRepo(BaseRepo[models.User, schemas.UserInvite]):
         """Get user by email or none if not found"""
         query = sa.select(models.User).where(models.User.email == email)
         return await db.scalar(query)
+
+    @override
+    async def bulk_create(
+        self,
+        db: AsyncSession,
+        *,
+        objs_in: list[schemas.UserInvite]
+    ) -> list[models.User]:
+        """Create bulk users. Skip conflicts"""
+        query = (
+            pg.insert(models.User)
+            .values([o.model_dump() for o in objs_in])
+            .on_conflict_do_nothing(index_elements=[models.User.email])
+            .returning(models.User)
+        )
+        res = await db.scalars(query)
+        return list(res.all())
 
     async def authenticate(
         self,
