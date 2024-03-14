@@ -1,3 +1,4 @@
+import uuid
 from typing import Literal
 
 from app.schemas import BaseSchema, Cipher, Collection
@@ -9,6 +10,6 @@ class SyncData(BaseSchema):
     Sync data schema
     """
 
-    data: Collection | Cipher
-    type: Literal["collection", "cipher"]
+    data: Collection | Cipher | uuid.UUID
+    type: Literal["collection", "cipher", "id"]
     action: Op

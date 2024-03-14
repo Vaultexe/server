@@ -47,5 +47,6 @@ class CookieKey(BaseEnum):
 class Op(BaseEnum):
     CREATE = auto()
     UPDATE = auto()
+    RESTORE = auto()
     DELETE = auto()
     SOFT_DELETE = auto()
