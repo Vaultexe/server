@@ -40,6 +40,39 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         cipher.soft_delete()
         return cipher
 
+    async def restore(
+        self,
+        db: AsyncSession,
+        *,
+        id: uuid.UUID,
+    ) -> models.Cipher | None:
+        """
+        Restore a soft deleted cipher
+        Return cipher if exists else returns None
+        """
+        query = (
+            sa.update(self.model)
+            .where(self.model.id == id)
+            .values(deleted_at=None)
+            .returning(self.model)
+        )
+        result = await db.scalar(query)
+        return result
+
+    async def permanent_delete(
+        self,
+        db: AsyncSession,
+        *,
+        id: uuid.UUID,
+    ) -> bool:
+        """
+        Permanent delete cipher
+        Return True if cipher is deleted else False if cipher does not exist
+        """
+        query = sa.delete(self.model).where(self.model.id == id)
+        result = await db.execute(query)
+        return bool(result.rowcount)
+
     async def soft_delete_collection(
         self,
         db: AsyncSession,
@@ -47,7 +80,7 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         id: uuid.UUID,
     ) -> list[uuid.UUID]:
         """
-        Soft delete all ciphers ina  collection
+        Soft delete all ciphers in a collection
         Returns list of cipher ids
         """
         query = (
@@ -73,5 +106,14 @@ class CipherRepo(BaseRepo[models.Cipher, schemas.CipherCreate]):
         filters = sa.and_(self.model.user_id == user_id, self.model.deleted_at == None)
         return await super()._get_all(db, filter=filters)
 
+    @deprecated("Use it in development only", category=DeprecationWarning)
+    async def _get_all_deleted(
+        self,
+        db: AsyncSession,
+        *,
+        user_id: uuid.UUID,
+    ) -> list[models.Cipher]:
+        filters = sa.and_(self.model.user_id == user_id, self.model.deleted_at != None)
+        return await super()._get_all(db, filter=filters)
 
 cipher = CipherRepo(models.Cipher)
