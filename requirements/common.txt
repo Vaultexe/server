@@ -1,6 +1,6 @@
 # App
 fastapi==0.110.0
-uvicorn==0.25.0
+uvicorn==0.29.0
 sse-starlette==1.8.2
 pydantic==2.6.3
 pydantic-settings==2.1.0
